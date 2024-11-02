@@ -12,18 +12,26 @@ export default function Landing() {
 function HeroSection() {
     return (
         <div className="w-full flex flex-col md:flex-row justify-center gap-12 items-center">
+
             <div className="w-3/4 md:w-1/2 order-2 md:order-1">
+
                 <h1 className="font-bold text-4xl md:text-5xl lg:text-6xl text-shadow-orbit mb-8">
-                    Explore culture worldwide through dance
+                    DANCING MADE EASY
                 </h1>
-                <a className="w-fit box-shadow-orbit border-4 border-black px-4 py-2 text-xl font-bold flex gap-x-2 items-center" href="/">
+
+                <p className="font-orbit font-bold text-2xl mb-4">Explore culture worldwide through dance</p>
+
+                <a className="bg-gradient-1 w-fit px-4 py-3 text-xl font-orbit font-bold flex gap-x-4 items-center" href="/">
                     get started
                     <FaLongArrowAltRight />
                 </a>
+            
             </div>
-            <div className="w-1/2 order-1 md:order-2">
-                <img src="/3d-rendering-earth-map.png"/>
+
+            <div className="p-12 w-1/2 order-1 md:order-2">
+                <img src="/brandbird.png"/>
             </div>
+        
         </div>
     )
 }
