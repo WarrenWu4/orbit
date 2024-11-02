@@ -13,7 +13,7 @@ export default function Explore() {
         async function fetchVideos() {
             // fetch videos from the database
             const querySnapshot = await getDocs(collection(db, "videos"));
-            const tempVideos:any[] = [];
+            const tempVideos: any[] = [];
             querySnapshot.forEach((doc) => {
                 tempVideos.push({
                     id: doc.id,
@@ -36,7 +36,7 @@ export default function Explore() {
                 <span className="mb-8">play a trending dance</span>
 
                 <div className="grid grid-cols-3 gap-y-16 gap-x-16 mx-16">
-                    { videos.length !== 0 &&
+                    {videos.length !== 0 &&
                         videos.map((video, index) => (
                             <VideoCard key={index}
                                 videoId={video.id}
@@ -79,19 +79,20 @@ function VideoCard(props: any) {
             </div>
 
 
-            <div className="video-container relative">
+            <div className="video-container relative overflow-x-hidden">
+                <ReactPlayer
+                    url={props.videoUrl}
+                    playing={isHovered}
+                    height="100%"
+                    style={{ aspectRatio: '16/9', transform: 'translateX(-30%)' }}
+                />
+
                 {!isHovered && (
-                    <div className="absolute inset-0 bg-gray-700 bg-opacity-75 flex flex-col items-center justify-center text-white">
+                    <div className="absolute z-2 inset-0 bg-gray-700 bg-opacity-75 flex flex-col items-center justify-center text-white">
                         <img src="/tap.png" alt="" />
                         <span>Hover Me</span>
                     </div>
                 )}
-                <ReactPlayer
-                    url={props.videoUrl}
-                    playing={isHovered}
-                    width="100%"
-                    style={{ aspectRatio: '9/12' }}
-                />
             </div>
             <div>{props.videoTitle}</div>
             <div className="w-full flex flex-row">
