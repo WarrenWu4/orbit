@@ -1,14 +1,14 @@
-import { useContext, useEffect } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { AuthContext } from "../context/AuthContext"
-import { redirect } from "react-router-dom";
 import Page from "../layouts/Page";
 import { FaAtlas, FaHistory, FaVideo } from "react-icons/fa";
-import BasicForm from "../components/BasicForm";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { storage } from "../firebase";
+import { db, storage } from "../firebase";
+import { addDoc, collection } from "firebase/firestore";
 
 export default function Dashboard() {
 
+    const [content, setContent] = useState(<MainContent/>);
     const user = useContext(AuthContext);
 
     useEffect(() => {
@@ -27,8 +27,11 @@ export default function Dashboard() {
                     <div className="w-full h-full flex gap-4">
                         <Sidebar
                             username={user.displayName!}
+                            setContent={setContent}
                         />
-                        <MainContent />
+                        <div className="w-full h-full border-4 p-4 border-white">
+                            {content}
+                        </div>
                     </div>
                 )
             }
@@ -39,28 +42,28 @@ export default function Dashboard() {
 
 interface SidebarProps {
     username: string;
+    setContent: React.Dispatch<React.SetStateAction<JSX.Element>>;
 }
 
-function Sidebar({username}: SidebarProps) {
+function Sidebar({username, setContent}: SidebarProps) {
 
+    const sections = [
+        {icon: <FaVideo />, title: "Upload Video", content: <MainContent/>},
+        {icon: <FaAtlas />, title: "Manage Videos", content: <h1>Manage Videos</h1>},
+        {icon: <FaHistory />, title: "Dance History", content: <h1>Dance History</h1>},
+    ]
 
     return (
         <div className="max-w-[300px] w-full h-full border-4 border-white p-4 flex flex-col gap-y-8 font-orbit font-bold">
 
-            <div className="flex items-center gap-x-4">
-                <FaVideo />
-                <h4>Upload Video</h4>
-            </div>
-
-            <div className="flex items-center gap-x-4">
-                <FaAtlas />
-                <h4>Manage Videos</h4>
-            </div>
-
-            <div className="flex items-center gap-x-4">
-                <FaHistory />
-                <h4>Dance History</h4>
-            </div>
+            {sections.map((section, index) => {
+                return (
+                    <button key={index} type="button" onClick={() => setContent(section.content)} className="flex items-center gap-x-4">
+                        {section.icon}
+                        <h4>{section.title}</h4>
+                    </button>
+                )
+            })}
 
             <div className="mt-auto">
                 <h4>{username}</h4>
@@ -71,6 +74,9 @@ function Sidebar({username}: SidebarProps) {
 }
 
 function MainContent() {
+
+    const user = useContext(AuthContext);
+    const videoTitle = useRef<HTMLInputElement>(null);
 
     function handleVideoUpload(e: React.FormEvent) {
         e.preventDefault();
@@ -98,13 +104,21 @@ function MainContent() {
               // Upload completed successfully
               const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
               console.log("File available at", downloadURL);
+              // upload video link and data to firestore
+              await addDoc(collection(db, `videos/`), {
+                user: user!.uid,
+                title: (videoTitle.current) ? videoTitle.current.value : "o shit",
+                videoURL: downloadURL,
+                hearts: 0,
+                vectorData: []
+              })
             }
           );
         console.log("Video uploaded");
     }
 
     return (
-        <div className="w-full h-full border-4 p-4 border-white">
+        <div>
             <h1 className="text-2xl font-bold mb-4">
                 Upload Your Dance Video
             </h1>
@@ -115,7 +129,7 @@ function MainContent() {
                     <label>
                         Video Title
                     </label>
-                    <input type="text" className="text-black border-2 border-black rounded-md p-2" />
+                    <input ref={videoTitle} type="text" className="text-black border-2 border-black rounded-md p-2" />
                 </div>
 
                 <div className="flex flex-col gap-y-1">

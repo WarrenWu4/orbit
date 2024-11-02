@@ -1,9 +1,10 @@
-import { Auth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import Page from "../layouts/Page";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { useContext, useEffect, useRef } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { redirect } from "react-router-dom";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function Login() {
 
@@ -37,6 +38,15 @@ export default function Login() {
         const provider = new GoogleAuthProvider();
         try {
             const result = await signInWithPopup(auth, provider)
+            const userData = result.user;
+            // store user in the database as a document
+            await setDoc(doc(db, "users", userData.uid), {
+                email: userData.email,
+                displayName: userData.displayName,
+                photoUrl: userData.photoURL
+            });
+            // redirect to dashboard
+            redirect("/dashboard");
         } catch (error) {
             console.error(error)
         }

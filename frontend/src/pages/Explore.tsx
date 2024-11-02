@@ -1,10 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Page from "../layouts/Page";
 import ReactPlayer from "react-player";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
 
 export default function Explore() {
 
+    const [videos, setVideos] = useState<any[]>([]);
 
+    useEffect(() => {
+
+        async function fetchVideos() {
+            // fetch videos from the database
+            const querySnapshot = await getDocs(collection(db, "videos"));
+            const tempVideos:any[] = [];
+            querySnapshot.forEach((doc) => {
+                tempVideos.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            setVideos(tempVideos);
+        }
+
+        fetchVideos();
+
+    }, [])
 
     return (
         <Page>
@@ -15,13 +36,12 @@ export default function Explore() {
                 <span className="mb-8">play a trending dance</span>
 
                 <div className="grid grid-cols-3 gap-y-16 gap-x-16 mx-16">
-                    {
-                        [1, 2, 3, 4, 5, 6, 7, 8].map((video, index) => (
+                    { videos.length !== 0 &&
+                        videos.map((video, index) => (
                             <VideoCard key={index}
-                                videoUrl={`https://www.youtube.com/watch?v=tCDvOQI3pco`}
-                                musicTitle="Thriller"
-                                creator="Jelly FIsh"
-                                videoTitle="Werewolf Dance"
+                                videoUrl={video.videoURL}
+                                videoTitle={video.title}
+                                hearts={video.hearts}
                             />
                         ))
                     }
@@ -35,7 +55,6 @@ export default function Explore() {
 
 function VideoCard(props: any) {
     const [isHovered, setIsHovered] = useState(false);
-
     return (
         <div className="flex flex-col border-4 border-white px-4 py-2 hover:shadow-arcade hover:cursor-pointer relative gap-1"
             onMouseEnter={() => setIsHovered(true)}
@@ -47,7 +66,7 @@ function VideoCard(props: any) {
                     <div className="w-[15px]">
                         <img src="/musical-note.png" alt="Music note" />
                     </div>
-                    <span>{props.musicTitle.length > 10 ? `${props.musicTitle.substring(0, 10)}...` : props.musicTitle}</span>
+                    {/* <span>{props.musicTitle.length > 10 ? `${props.musicTitle.substring(0, 10)}...` : props.musicTitle}</span> */}
                 </div>
                 <div className="flex flex-row gap-2 items-center underline text-sm">
                     try it!
@@ -73,10 +92,10 @@ function VideoCard(props: any) {
                     style={{ aspectRatio: '9/12' }}
                 />
             </div>
-            <div className="text-sm">{props.videoTitle}</div>
-            <div className="flex flex-row">
-                <span className="font-bold flex-1">{props.creator}</span>
-                <span className="flex gap-1"><img className="w-[20px]" src="/pixel-heart.png" alt="Missing" />1500</span>
+            <div>{props.videoTitle}</div>
+            <div className="w-full flex flex-row">
+                {/* <span className="font-bold flex-1">{props.creator}</span> */}
+                <span><img src="" alt="" />{props.heart}</span>
             </div>
         </div>
     )
