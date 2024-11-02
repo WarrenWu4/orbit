@@ -20,10 +20,14 @@ export default function Play() {
   const [isPlaying, setIsPlaying] = useState(true);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [currentTime, setCurrentTime] = useState(0);
+  const [similarityScore, setSimilarityScore] = useState<number | null>(null);
 
   let poseLandmarker: PoseLandmarker | undefined;
   let webcamRunning: boolean = false;
   let videoRunning: boolean = false;
+
+  let videoPoseData: any = null;
+  let webcamPoseData: any = null;
 
   async function loadPoseLandmarker() {
     const vision = await FilesetResolver.forVisionTasks(
@@ -55,29 +59,88 @@ export default function Play() {
     }
   }
 
-  function drawResults(result: any, canvasCtx: CanvasRenderingContext2D) {
-    canvasCtx.clearRect(0, 0, canvasCtx.canvas.width, canvasCtx.canvas.height);
-    const drawingUtils = new DrawingUtils(canvasCtx);
+  function drawResults(
+    result: any,
+    canvasCtx: CanvasRenderingContext2D | null,
+    source: "video" | "webcam"
+  ) {
+    if (!canvasCtx) {
+      console.error("Canvas context is null");
+      return;
+    }
 
-    for (const landmark of result.landmarks) {
-      drawingUtils.drawLandmarks(landmark, {
-        radius: 2,
-      });
-      drawingUtils.drawConnectors(landmark, PoseLandmarker.POSE_CONNECTIONS, {
-        lineWidth: 0.5,
-      });
+    canvasCtx.clearRect(0, 0, canvasCtx.canvas.width, canvasCtx.canvas.height);
+
+    if (result.landmarks && result.landmarks.length > 0) {
+      console.log(`Drawing ${result.landmarks.length} landmarks on ${source}`);
+      const drawingUtils = new DrawingUtils(canvasCtx);
+
+      for (const landmark of result.landmarks) {
+        drawingUtils.drawLandmarks(landmark, {
+          radius: 2,
+        });
+        drawingUtils.drawConnectors(landmark, PoseLandmarker.POSE_CONNECTIONS, {
+          lineWidth: 0.5,
+        });
+      }
+
+      // Save pose data for similarity calculation
+      if (source === "video") {
+        videoPoseData = result.landmarks;
+      } else if (source === "webcam") {
+        webcamPoseData = result.landmarks;
+        calculateSimilarityScore();
+      }
+    } else {
+      console.warn(`No landmarks detected for ${source}`);
     }
   }
 
-  async function predictVideo(videoElement: HTMLVideoElement, canvasElement: HTMLCanvasElement) {
+  function calculateSimilarityScore() {
+    if (!videoPoseData || !webcamPoseData) return;
+
+    let totalDistance = 0;
+    let count = 0;
+
+    for (
+      let i = 0;
+      i < Math.min(videoPoseData.length, webcamPoseData.length);
+      i++
+    ) {
+      const videoLandmark = videoPoseData[i];
+      const webcamLandmark = webcamPoseData[i];
+
+      const distance = Math.sqrt(
+        Math.pow(videoLandmark.x - webcamLandmark.x, 2) +
+          Math.pow(videoLandmark.y - webcamLandmark.y, 2) +
+          Math.pow(videoLandmark.z - webcamLandmark.z, 2)
+      );
+
+      totalDistance += distance;
+      count++;
+    }
+
+    const averageDistance = totalDistance / count;
+    const normalizedScore = Math.max(0, 100 - averageDistance * 1000); // Scale for visualization
+    setSimilarityScore(normalizedScore);
+  }
+
+  async function predictVideo(
+    videoElement: HTMLVideoElement,
+    canvasElement: HTMLCanvasElement
+  ) {
     if (!poseLandmarker) return;
     const canvasCtx = canvasElement.getContext("2d");
 
     function detectFrame() {
       if (!poseLandmarker || !videoElement) return;
-      poseLandmarker.detectForVideo(videoElement, performance.now(), (result) => {
-        drawResults(result, canvasCtx!);
-      });
+      poseLandmarker.detectForVideo(
+        videoElement,
+        performance.now(),
+        (result) => {
+          drawResults(result, canvasCtx!, "video");
+        }
+      );
 
       if (!videoElement.paused && !videoElement.ended) {
         window.requestAnimationFrame(detectFrame);
@@ -88,15 +151,20 @@ export default function Play() {
   }
 
   async function predictWebcam() {
-    if (!poseLandmarker || !webcamRef.current || !webcamCanvasRef.current) return;
+    if (!poseLandmarker || !webcamRef.current || !webcamCanvasRef.current)
+      return;
 
     const canvasCtx = webcamCanvasRef.current.getContext("2d");
 
     function detectFrame() {
       if (!poseLandmarker || !webcamRef.current) return;
-      poseLandmarker.detectForVideo(webcamRef.current, performance.now(), (result) => {
-        drawResults(result, canvasCtx!);
-      });
+      poseLandmarker.detectForVideo(
+        webcamRef.current,
+        performance.now(),
+        (result) => {
+          drawResults(result, canvasCtx!, "webcam");
+        }
+      );
 
       if (webcamRunning) {
         window.requestAnimationFrame(detectFrame);
@@ -122,18 +190,17 @@ export default function Play() {
       openCamera();
     });
 
-    // Add event listener for space key
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.code === 'Space') {
-        event.preventDefault(); // Prevent the default spacebar scrolling
+      if (event.code === "Space") {
+        event.preventDefault();
         handlePlayPause();
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);
       webcamRunning = false;
       videoRunning = false;
     };
@@ -187,12 +254,12 @@ export default function Play() {
   return (
     <Page>
       <div className="flex flex-row justify-between space-x-4">
-        {/* Dance/Comparison Video */}
-        <div className="videoView" style={{ height: '500px' }}>
+        {/* Dance/Comparison Video with Pose Detection Overlay */}
+        <div className="videoView" style={{ height: "500px" }}>
           <video
             id="danceVideo"
             ref={videoRef}
-            src="/rasputin.mp4" // Source for the dance video
+            src="/posedemovid.mov" // Source for the dance video
             className="w-full h-full"
             autoPlay
             loop
@@ -203,12 +270,18 @@ export default function Play() {
             id="video_output_canvas"
             ref={videoCanvasRef}
             className="canvas output_canvas"
-            style={{ height: '100%', width: '100%' }}
+            style={{
+              height: "100%",
+              width: "100%",
+              position: "absolute",
+              top: 0,
+              left: 0,
+            }}
           />
         </div>
 
-        {/* Webcam Video */}
-        <div className="videoView" style={{ height: '500px' }}>
+        {/* Webcam Video with Pose Detection Overlay */}
+        <div className="videoView" style={{ height: "500px" }}>
           <video
             id="webcam"
             ref={webcamRef}
@@ -222,14 +295,23 @@ export default function Play() {
             id="webcam_output_canvas"
             ref={webcamCanvasRef}
             className="canvas output_canvas"
-            style={{ height: '100%', width: '100%' }}
+            style={{
+              height: "100%",
+              width: "100%",
+              position: "absolute",
+              top: 0,
+              left: 0,
+            }}
           />
         </div>
       </div>
 
       {/* Controls */}
       <div className="controls flex justify-between items-center p-2 bg-gray-800 rounded-lg text-white">
-        <button onClick={handlePlayPause} className="btn p-2 bg-blue-600 rounded-full hover:bg-blue-700 flex items-center">
+        <button
+          onClick={handlePlayPause}
+          className="btn p-2 bg-blue-600 rounded-full hover:bg-blue-700 flex items-center"
+        >
           {isPlaying ? <FaPause /> : <FaPlay />}
         </button>
         <div className="speed-controls flex space-x-2">
@@ -238,7 +320,7 @@ export default function Play() {
               key={speed}
               onClick={() => handleSpeedChange(speed)}
               className={`btn p-2 rounded-full ${
-                playbackRate === speed ? 'bg-green-600' : 'bg-gray-600'
+                playbackRate === speed ? "bg-green-600" : "bg-gray-600"
               } hover:bg-green-700 flex items-center`}
             >
               <FaTachometerAlt className="mr-1" />
@@ -255,6 +337,11 @@ export default function Play() {
           className="timeline w-full mx-4"
         />
       </div>
+
+      {/* Display Similarity Score */}
+      {similarityScore !== null && (
+        <div className="text-center mt-4 text-white"></div>
+      )}
     </Page>
   );
 }
