@@ -21,7 +21,7 @@ function HeroSection() {
 
                 <p className="font-orbit font-bold text-2xl mb-4">Explore culture worldwide through dance</p>
 
-                <a className="bg-gradient-1 w-fit px-4 py-3 text-xl font-orbit font-bold flex gap-x-4 items-center" href="/">
+                <a href="/explore" className="bg-gradient-1 w-fit px-4 py-3 text-xl font-orbit font-bold flex gap-x-4 items-center">
                     get started
                     <FaLongArrowAltRight />
                 </a>
