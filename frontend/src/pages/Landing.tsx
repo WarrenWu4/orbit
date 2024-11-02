@@ -15,7 +15,7 @@ function HeroSection() {
 
             <div className="w-3/4 md:w-1/2 order-2 md:order-1">
 
-                <h1 className="font-bold text-4xl md:text-5xl lg:text-6xl mb-8">
+                <h1 className="text-white font-bold text-4xl md:text-5xl lg:text-6xl mb-8">
                     DANCING MADE EASY
                 </h1>
 
