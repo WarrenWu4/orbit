@@ -2,10 +2,13 @@ import { useContext } from "react"
 import { AuthContext } from "../context/AuthContext"
 import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
+import { useLocation } from "react-router-dom";
 
 export default function Navbar() {
 
     const user = useContext(AuthContext)
+    const activeRoute = useLocation().pathname
+    const underlineStyle = "underline underline-offset-8 decoration-2"
 
     async function handleLogOut() {
         try {
@@ -24,9 +27,9 @@ export default function Navbar() {
             </a>
             
             <div className="flex gap-x-4 items-center font-orbit font-bold">
-                <a href="/">Home</a>
-                <a href="/dashboard">Dashboard</a>
-                <a href="/explore">Explore</a>
+                <a className={(activeRoute == "/") ? underlineStyle : ""} href="/">Home</a>
+                <a className={(activeRoute == "/dashboard") ? underlineStyle : ""}  href="/dashboard">Dashboard</a>
+                <a className={(activeRoute == "/explore") ?  underlineStyle : ""}  href="/explore">Explore</a>
                 {
                     (user !== null) ? (
                         <button type="button" onClick={handleLogOut}>
