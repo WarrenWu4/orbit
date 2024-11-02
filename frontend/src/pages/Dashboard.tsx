@@ -4,7 +4,7 @@ import Page from "../layouts/Page";
 import { FaAtlas, FaHistory, FaVideo } from "react-icons/fa";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { db, storage } from "../firebase";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 
 export default function Dashboard() {
 
@@ -49,7 +49,7 @@ function Sidebar({username, setContent}: SidebarProps) {
 
     const sections = [
         {icon: <FaVideo />, title: "Upload Video", content: <MainContent/>},
-        {icon: <FaAtlas />, title: "Manage Videos", content: <h1>Manage Videos</h1>},
+        {icon: <FaAtlas />, title: "Manage Videos", content: <ManageVideos/>},
         {icon: <FaHistory />, title: "Dance History", content: <h1>Dance History</h1>},
     ]
 
@@ -144,6 +144,52 @@ function MainContent() {
                 </button>
 
             </form>
+        </div>
+    )
+}
+
+function ManageVideos() {
+
+    const [videos, setVideos] = useState<any[]>([]);
+    const user = useContext(AuthContext);
+
+    useEffect(() => {
+        
+        async function fetchVideos() {
+            const tempVideos: any[] = [];
+            const q = query(collection(db, "videos"), where("user", "==", user!.uid));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                tempVideos.push({
+                    title: doc.data().title,
+                    docRefId: doc.id,
+                });
+            })
+            setVideos(tempVideos);
+        }
+
+        fetchVideos();
+    
+    }, [])
+
+    return (
+        <div>
+
+            <h1 className="text-2xl font-bold mb-4">
+                Upload Your Dance Video
+            </h1>
+
+            {videos.map((video) => {
+                return(
+                    <div key={video.docRefId} className="w-full p-4 flex justify-between">
+                        <h1>{video.title}</h1>
+                        <div>
+                            <button></button>
+                        </div>
+                    </div>
+                )
+            })}
+
         </div>
     )
 }

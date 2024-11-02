@@ -39,6 +39,7 @@ export default function Explore() {
                     { videos.length !== 0 &&
                         videos.map((video, index) => (
                             <VideoCard key={index}
+                                videoId={video.id}
                                 videoUrl={video.videoURL}
                                 videoTitle={video.title}
                                 hearts={video.hearts}
@@ -68,13 +69,13 @@ function VideoCard(props: any) {
                     </div>
                     {/* <span>{props.musicTitle.length > 10 ? `${props.musicTitle.substring(0, 10)}...` : props.musicTitle}</span> */}
                 </div>
-                <div className="flex flex-row gap-2 items-center underline text-sm">
+                <a href={`/play/${props.videoId}`} className="flex flex-row gap-2 items-center underline text-sm">
                     try it!
                     <div className="w-[25px]">
                         <img src="/joystick.png" alt="play" />
                     </div>
 
-                </div>
+                </a>
             </div>
 
 
