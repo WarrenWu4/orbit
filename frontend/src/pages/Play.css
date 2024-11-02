@@ -133,3 +133,7 @@ video {
   z-index: 1; /* Ensure canvas is on top */
   pointer-events: none; /* Allow interactions to pass through */
 }
+
+.timeline {
+  accent-color: #4ade80; /* Green accent color */
+}
