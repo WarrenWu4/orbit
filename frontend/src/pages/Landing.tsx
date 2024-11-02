@@ -11,7 +11,7 @@ export default function Landing() {
 
 function HeroSection() {
     return (
-        <div className="w-full flex flex-col md:flex-row justify-center gap-12 items-center">
+        <div className="-mt-6 w-full flex flex-col md:flex-row justify-center gap-12 items-center">
 
             <div className="w-3/4 md:w-1/2 order-2 md:order-1">
 

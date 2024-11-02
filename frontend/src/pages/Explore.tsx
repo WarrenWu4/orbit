@@ -9,7 +9,7 @@ export default function Explore() {
             
             <div>
                 
-                <h1>trending dances</h1>
+                <h1 className="text-white">trending dances</h1>
 
                 <div>
                     <VideoCard/>
