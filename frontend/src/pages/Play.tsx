@@ -77,10 +77,11 @@ export default function Play() {
 
       for (const landmark of result.landmarks) {
         drawingUtils.drawLandmarks(landmark, {
-          radius: 2,
+          radius: 2.5,
+          color: "purple",
         });
         drawingUtils.drawConnectors(landmark, PoseLandmarker.POSE_CONNECTIONS, {
-          lineWidth: 0.5,
+          lineWidth: 2,
         });
       }
 
@@ -125,31 +126,6 @@ export default function Play() {
     setSimilarityScore(normalizedScore);
   }
 
-  async function predictVideo(
-    videoElement: HTMLVideoElement,
-    canvasElement: HTMLCanvasElement
-  ) {
-    if (!poseLandmarker) return;
-    const canvasCtx = canvasElement.getContext("2d");
-
-    function detectFrame() {
-      if (!poseLandmarker || !videoElement) return;
-      poseLandmarker.detectForVideo(
-        videoElement,
-        performance.now(),
-        (result) => {
-          drawResults(result, canvasCtx!, "video");
-        }
-      );
-
-      if (!videoElement.paused && !videoElement.ended) {
-        window.requestAnimationFrame(detectFrame);
-      }
-    }
-
-    detectFrame();
-  }
-
   async function predictWebcam() {
     if (!poseLandmarker || !webcamRef.current || !webcamCanvasRef.current)
       return;
@@ -180,7 +156,6 @@ export default function Play() {
       if (videoRef.current) {
         videoRef.current.addEventListener("loadeddata", () => {
           resizeCanvasToMatchVideo(videoRef, videoCanvasRef);
-          predictVideo(videoRef.current!, videoCanvasRef.current!);
         });
 
         videoRef.current.addEventListener("timeupdate", () => {
@@ -259,7 +234,7 @@ export default function Play() {
           <video
             id="danceVideo"
             ref={videoRef}
-            src="/posedemovid.mov" // Source for the dance video
+            src="/rasputin2.mp4" // Source for the dance video
             className="w-full h-full"
             autoPlay
             loop
