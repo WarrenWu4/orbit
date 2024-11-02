@@ -17,17 +17,12 @@ export default function Play() {
   const webcamRef = useRef<HTMLVideoElement | null>(null);
   const videoCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const webcamCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [currentTime, setCurrentTime] = useState(0);
-  const [similarityScore, setSimilarityScore] = useState<number | null>(null);
 
   let poseLandmarker: PoseLandmarker | undefined;
   let webcamRunning: boolean = false;
-  let videoRunning: boolean = false;
-
-  let videoPoseData: any = null;
-  let webcamPoseData: any = null;
 
   async function loadPoseLandmarker() {
     const vision = await FilesetResolver.forVisionTasks(
@@ -84,46 +79,9 @@ export default function Play() {
           lineWidth: 2,
         });
       }
-
-      // Save pose data for similarity calculation
-      if (source === "video") {
-        videoPoseData = result.landmarks;
-      } else if (source === "webcam") {
-        webcamPoseData = result.landmarks;
-        calculateSimilarityScore();
-      }
     } else {
       console.warn(`No landmarks detected for ${source}`);
     }
-  }
-
-  function calculateSimilarityScore() {
-    if (!videoPoseData || !webcamPoseData) return;
-
-    let totalDistance = 0;
-    let count = 0;
-
-    for (
-      let i = 0;
-      i < Math.min(videoPoseData.length, webcamPoseData.length);
-      i++
-    ) {
-      const videoLandmark = videoPoseData[i];
-      const webcamLandmark = webcamPoseData[i];
-
-      const distance = Math.sqrt(
-        Math.pow(videoLandmark.x - webcamLandmark.x, 2) +
-          Math.pow(videoLandmark.y - webcamLandmark.y, 2) +
-          Math.pow(videoLandmark.z - webcamLandmark.z, 2)
-      );
-
-      totalDistance += distance;
-      count++;
-    }
-
-    const averageDistance = totalDistance / count;
-    const normalizedScore = Math.max(0, 100 - averageDistance * 1000); // Scale for visualization
-    setSimilarityScore(normalizedScore);
   }
 
   async function predictWebcam() {
@@ -138,7 +96,14 @@ export default function Play() {
         webcamRef.current,
         performance.now(),
         (result) => {
-          drawResults(result, canvasCtx!, "webcam");
+          if (result && result.landmarks) {
+            console.log("Webcam Pose Vectors:", result.landmarks);
+
+            // Draw landmarks and connections on the canvas
+            drawResults(result, canvasCtx!, "webcam");
+          } else {
+            console.log("No landmarks detected in the webcam frame.");
+          }
         }
       );
 
@@ -177,7 +142,6 @@ export default function Play() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       webcamRunning = false;
-      videoRunning = false;
     };
   }, []);
 
@@ -236,7 +200,6 @@ export default function Play() {
             ref={videoRef}
             src="/rasputin2.mp4" // Source for the dance video
             className="w-full h-full"
-            autoPlay
             loop
             muted
             style={{ objectFit: "cover" }}
@@ -312,11 +275,6 @@ export default function Play() {
           className="timeline w-full mx-4"
         />
       </div>
-
-      {/* Display Similarity Score */}
-      {similarityScore !== null && (
-        <div className="text-center mt-4 text-white"></div>
-      )}
     </Page>
   );
 }
