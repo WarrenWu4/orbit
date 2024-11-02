@@ -49,7 +49,7 @@ export default function Login() {
 
                 <form className="p-4 border-4 border-white flex flex-col gap-y-2" onSubmit={handleLogin}>
                     
-                    <h1 className="font-bold text-3xl"> Login to Orbit</h1>
+                    <h1 className="text-white font-bold text-3xl"> Login to Orbit</h1>
                     
                     <input className="p-2 my-2 border-2 border-white" type="text" placeholder="Username" />
 

@@ -1,71 +1,100 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Pixelify+Sans:wght@400..700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Pixelify+Sans:wght@400..700&display=swap");
 
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-    @font-face {
-        font-family: 'Retro Computer';
-        src: url('/fonts/retro_computer.ttf') format('truetype');
-    }
+  @font-face {
+    font-family: "Retro Computer";
+    src: url("/fonts/retro_computer.ttf") format("truetype");
+  }
+}
+
+html {
+  background: rgb(24, 33, 93);
+  background: linear-gradient(
+    0deg,
+    rgba(24, 33, 93, 1) 0%,
+    rgba(80, 49, 151, 1) 100%
+  );
 }
 
 #root {
-    width: 100vw;
-    height: 100vh;
-    overflow-x: hidden;
-    font-family: 'Retro Computer';
-    display: flex;
-    justify-content: center;
-    background: rgb(24,33,93);
-    background: linear-gradient(0deg, rgba(24,33,93,1) 0%, rgba(80,49,151,1) 100%);
-    color: white;
+  width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
+  font-family: "Retro Computer";
+  display: flex;
+  justify-content: center;
+
+  color: white;
 }
 
 .font-orbit {
-    font-family: 'IBM Plex Mono', serif;
+  font-family: "IBM Plex Mono", serif;
 }
 
-a, button {
-    cursor: pointer;
+a,
+button {
+  cursor: pointer;
 }
 
 .box-shadow-orbit {
-    box-shadow: 6px 4px black;
+  box-shadow: 6px 4px black;
 }
 
 .elevate-orbit:front {
-    transform: translateY(-6px);
+  transform: translateY(-6px);
 }
 
 .w-full-orbit {
-    width: calc(100% + 8px);
+  width: calc(100% + 8px);
 }
 
 .text-shadow-orbit {
-	text-shadow: -0.0075em 0.0075em 0 color-mix(in srgb, #fff 94%, #e91e63), 0.005em 0.005em 0 color-mix(in srgb, #fff 60%, #e91e63), 0.01em 0.01em 0 color-mix(in srgb, #fff 62%, #e91e63), 0.015em 0.015em color-mix(in srgb, #fff 64%, #e91e63), 0.02em 0.02em 0 color-mix(in srgb, #fff 66%, #e91e63), 0.025em 0.025em 0 color-mix(in srgb, #fff 68%, #e91e63), 0.03em 0.03em 0 color-mix(in srgb, #fff 70%, #e91e63), 0.035em 0.035em 0 color-mix(in srgb, #fff 72%, #e91e63);
+  text-shadow: -0.0075em 0.0075em 0 color-mix(in srgb, #fff 94%, #e91e63),
+    0.005em 0.005em 0 color-mix(in srgb, #fff 60%, #e91e63),
+    0.01em 0.01em 0 color-mix(in srgb, #fff 62%, #e91e63),
+    0.015em 0.015em color-mix(in srgb, #fff 64%, #e91e63),
+    0.02em 0.02em 0 color-mix(in srgb, #fff 66%, #e91e63),
+    0.025em 0.025em 0 color-mix(in srgb, #fff 68%, #e91e63),
+    0.03em 0.03em 0 color-mix(in srgb, #fff 70%, #e91e63),
+    0.035em 0.035em 0 color-mix(in srgb, #fff 72%, #e91e63);
 }
 
 .border-x-size {
-    width: 5px;
-    height: calc(100% - 10px);
+  width: 5px;
+  height: calc(100% - 10px);
 }
 
 .border-y-size {
-    width: calc(100% - 10px);
-    height: 5px;
+  width: calc(100% - 10px);
+  height: 5px;
 }
 
 .bg-gradient-1 {
-    background: rgb(250,170,80);
-    background: linear-gradient(90deg, rgba(250,170,80,1) 0%, rgba(225,124,183,1) 100%);
+  background: rgb(250, 170, 80);
+  background: linear-gradient(
+    90deg,
+    rgba(250, 170, 80, 1) 0%,
+    rgba(225, 124, 183, 1) 100%
+  );
 }
 
 .bg-gradient-1:hover {
-    background: rgb(225,124,183);
-    background: linear-gradient(90deg, rgba(225,124,183,1) 0%, rgba(250,170,80,1) 100%);
+  background: rgb(225, 124, 183);
+  background: linear-gradient(
+    90deg,
+    rgba(225, 124, 183, 1) 0%,
+    rgba(250, 170, 80, 1) 100%
+  );
+}
+
+body {
+  margin: 0;
+  padding: 0;
 }
