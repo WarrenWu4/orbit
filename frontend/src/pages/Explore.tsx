@@ -11,7 +11,7 @@ export default function Explore() {
 
             <div className="w-full h-full flex flex-col items-center">
 
-                <h1 className="font-bold text-3xl">trending dances</h1>
+                <h1 className="text-white font-bold text-3xl">trending dances</h1>
                 <span className="mb-8">play a trending dance</span>
 
                 <div className="grid grid-cols-3 gap-y-16 gap-x-16 mx-16">

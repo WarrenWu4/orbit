@@ -17,7 +17,7 @@ export default function Dashboard() {
             {
                 (user === null) ? (
                     <div className="w-full h-full grid place-items-center">
-                        <h1>Please login first to use this feature</h1>
+                        <h1 className="text-white">Please login first to use this feature</h1>
                     </div>
                 ): (
                     <div>
