@@ -1,160 +1,71 @@
-/* Copyright 2023 The MediaPipe Authors.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Pixelify+Sans:wght@400..700&display=swap');
 
-     http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License. */
-
-@use "@material";
-@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&family=Pixelify+Sans:wght@400..700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: "Inter", sans-serif;
-  margin: 2em;
-  color: #3d3d3d;
-  --mdc-theme-primary: #007f8b;
-  --mdc-theme-on-primary: #f1f3f4;
-}
-
-h1 {
-  color: #007f8b;
-}
-
-h2 {
-  clear: both;
-}
-
-em {
-  font-weight: bold;
-}
-
-video {
-  display: block;
-  width: 100%; /* Ensure video and canvas have the same width */
-  transform: rotateY(180deg);
-  -webkit-transform: rotateY(180deg);
-  -moz-transform: rotateY(180deg);
-}
-
-section {
-  opacity: 1;
-  transition: opacity 500ms ease-in-out;
-}
-
-header,
-footer {
-  clear: both;
-}
-
-.removed {
-  display: none;
-}
-
-.invisible {
-  opacity: 0.2;
-}
-
-.note {
-  font-style: italic;
-  font-size: 130%;
-}
-
-.videoView {
-  position: relative;
-  float: left;
-  width: 48%;
-  margin: 2% 1%;
-  cursor: pointer;
-}
-
-.videoView p,
-.detectOnClick p {
-  position: absolute;
-  padding: 5px;
-  background-color: #007f8b;
-  color: #fff;
-  border: 1px dashed rgba(255, 255, 255, 0.7);
-  z-index: 2;
-  font-size: 12px;
-  margin: 0;
-}
-
-.detectOnClick {
-  position: relative;
-  z-index: 0;
-}
-
-.detectOnClick img {
-  width: 100%;
-}
-
-.highlighter {
-  background: rgba(0, 255, 0, 0.25);
-  border: 1px dashed #fff;
-  z-index: 1;
-  position: absolute;
-}
-
-.canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%; /* Match the video width */
-  height: 100%; /* Match the video height */
-  z-index: 1; /* Ensure canvas is on top */
-  pointer-events: none; /* Allow interactions to pass through the canvas */
-}
-
-.output_canvas {
-  transform: rotateY(180deg);
-  -webkit-transform: rotateY(180deg);
-  -moz-transform: rotateY(180deg);
+@layer base {
+    @font-face {
+        font-family: 'Retro Computer';
+        src: url('/fonts/retro_computer.ttf') format('truetype');
+    }
 }
 
 #root {
-  width: 100vw;
-  height: 100vh;
-  overflow-x: hidden;
-  font-family: "Inter", sans-serif;
-  display: flex;
-  justify-content: center;
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden;
+    font-family: 'Retro Computer';
+    display: flex;
+    justify-content: center;
+    background: rgb(24,33,93);
+    background: linear-gradient(0deg, rgba(24,33,93,1) 0%, rgba(80,49,151,1) 100%);
+    color: white;
 }
 
-a,
-button {
-  cursor: pointer;
+.font-orbit {
+    font-family: 'IBM Plex Mono', serif;
+}
+
+a, button {
+    cursor: pointer;
 }
 
 .box-shadow-orbit {
-  box-shadow: 6px 4px black;
+    box-shadow: 6px 4px black;
 }
 
 .elevate-orbit:front {
-  transform: translateY(-6px);
+    transform: translateY(-6px);
 }
 
 .w-full-orbit {
-  width: calc(100% + 8px);
+    width: calc(100% + 8px);
 }
 
 .text-shadow-orbit {
-  text-shadow: -0.0075em 0.0075em 0 color-mix(in srgb, #fff 94%, #e91e63),
-    0.005em 0.005em 0 color-mix(in srgb, #fff 60%, #e91e63),
-    0.01em 0.01em 0 color-mix(in srgb, #fff 62%, #e91e63),
-    0.015em 0.015em 0 color-mix(in srgb, #fff 64%, #e91e63),
-    0.02em 0.02em 0 color-mix(in srgb, #fff 66%, #e91e63),
-    0.025em 0.025em 0 color-mix(in srgb, #fff 68%, #e91e63),
-    0.03em 0.03em 0 color-mix(in srgb, #fff 70%, #e91e63),
-    0.035em 0.035em 0 color-mix(in srgb, #fff 72%, #e91e63);
+	text-shadow: -0.0075em 0.0075em 0 color-mix(in srgb, #fff 94%, #e91e63), 0.005em 0.005em 0 color-mix(in srgb, #fff 60%, #e91e63), 0.01em 0.01em 0 color-mix(in srgb, #fff 62%, #e91e63), 0.015em 0.015em color-mix(in srgb, #fff 64%, #e91e63), 0.02em 0.02em 0 color-mix(in srgb, #fff 66%, #e91e63), 0.025em 0.025em 0 color-mix(in srgb, #fff 68%, #e91e63), 0.03em 0.03em 0 color-mix(in srgb, #fff 70%, #e91e63), 0.035em 0.035em 0 color-mix(in srgb, #fff 72%, #e91e63);
+}
+
+.border-x-size {
+    width: 5px;
+    height: calc(100% - 10px);
+}
+
+.border-y-size {
+    width: calc(100% - 10px);
+    height: 5px;
+}
+
+.bg-gradient-1 {
+    background: rgb(250,170,80);
+    background: linear-gradient(90deg, rgba(250,170,80,1) 0%, rgba(225,124,183,1) 100%);
+}
+
+.bg-gradient-1:hover {
+    background: rgb(225,124,183);
+    background: linear-gradient(90deg, rgba(225,124,183,1) 0%, rgba(250,170,80,1) 100%);
 }
