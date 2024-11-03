@@ -121,8 +121,10 @@ export default function Play() {
             // get the nearest time frame
             if (videoRef) {
               if (videoRef.current!.currentTime > 0 && videoRef.current!.paused === false && videoRef.current?.ended === false) {
-                const score = calculateScore(vectorData, result.landmarks, currentTime);
-                setScore(Math.round(score));
+                const score = calculateScore(vectorData, result.landmarks, videoRef.current!.currentTime);
+                if ((videoRef.current!.currentTime % 2) <= 0.1) {
+                  setScore(Math.round(score));
+                }
               }
             }
 
