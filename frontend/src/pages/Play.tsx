@@ -10,6 +10,7 @@ import { FaPlay, FaPause, FaTachometerAlt } from "react-icons/fa";
 import { IoArrowBack } from "react-icons/io5"; // Import an icon for the back button
 import "./Play.css"; // Import the CSS file
 import calculateScore from "../lib/scoreCalculator";
+import GeminiContentComponent from "../components/GeminiContentComponent";
 
 export default function Play() {
   const { videoId } = useParams();
@@ -133,18 +134,19 @@ export default function Play() {
                 videoRef.current!.paused === false &&
                 videoRef.current?.ended === false
               ) {
-
                 // every 5 seconds, update the score
-                if (Math.floor(videoRef.current!.currentTime / 5) !== Math.floor(lastScoreUpdateTime / 5)) {
+                if (
+                  Math.floor(videoRef.current!.currentTime / 5) !==
+                  Math.floor(lastScoreUpdateTime / 5)
+                ) {
                   const score = calculateScore(
                     vectorData,
                     result.landmarks,
                     videoRef.current!.currentTime
                   );
-                  setScore((prev) => Math.round(score)+prev);
+                  setScore((prev) => Math.round(score) + prev);
                   lastScoreUpdateTime = videoRef.current!.currentTime;
                 }
-
               }
             }
 
@@ -572,6 +574,9 @@ export default function Play() {
             onChange={handleTimelineChange}
             className="timeline w-full mx-4 bg-transparent accent-purple-500 rounded-lg"
           />
+        </div>
+        <div>
+          <GeminiContentComponent danceName={videoId + " dance"}/>
         </div>
       </div>
     </Page>
