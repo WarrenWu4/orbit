@@ -1,9 +1,10 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import Page from "../layouts/Page";
 import { AuthContext } from "../context/AuthContext";
 import { redirect } from "react-router-dom";
+import { addDoc } from "firebase/firestore";
 
 export default function Signup() {
 
@@ -40,6 +41,11 @@ export default function Signup() {
                 emailRef.current!.value,
                 passwordRef.current!.value
             );
+            await addDoc(collections(db, "users"), {
+                email: emailRef.current!.value,
+                displayName: "John Doe",
+                photoUrl: ""
+            });
         } catch (error) {
             console.error(error);
         }
@@ -73,4 +79,8 @@ export default function Signup() {
 
         </Page>
     )
+}
+
+function collections(db: any, arg1: string): any {
+    throw new Error("Function not implemented.");
 }
