@@ -255,7 +255,7 @@ export default function Explore() {
             {!isHovered && (
               <div className="absolute z-2 inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-neon-purple">
                 <img src="/tap.png" alt="Tap" className="w-8" />
-                <span className="font-mono">Hover Me</span>
+                <span>Hover Me</span>
               </div>
             )}
           </div>
