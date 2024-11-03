@@ -288,7 +288,7 @@ export default function Play() {
       };
 
       // Set interval based on playback rate
-      const intervalDuration = 1000 / playbackRate; // Adjust interval inversely proportional to playback rate
+      const intervalDuration = 1250 / playbackRate; // Adjust interval inversely proportional to playback rate
       const interval = setInterval(captureFrameAhead, intervalDuration);
 
       return () => clearInterval(interval);
