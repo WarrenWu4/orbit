@@ -448,7 +448,7 @@ export default function Play() {
           >
             {isPlaying ? <FaPause /> : <FaPlay />}
           </button>
-          <div className="speed-controls flex space-x-2">
+          <div className="speed-controls flex space-x-2 ml-2">
             {[0.25, 0.5, 1, 1.5, 2].map((speed) => (
               <button
                 disabled={isPlaying}
