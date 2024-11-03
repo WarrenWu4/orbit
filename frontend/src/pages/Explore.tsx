@@ -145,6 +145,27 @@ export default function Explore() {
       country: "es",
     },
     {
+      id: "haidilao",
+      title: "Haidilao",
+      videoURL: "/videos/haidilao.mov",
+      hearts: 500,
+      country: "cn",
+    },
+    {
+        id:"samba",
+        title:"Samba",
+        videoURL:"/videos/samba.mov",
+        hearts: 300,
+        country: "br",
+    },
+    {
+        id:"floss",
+        title:"Floss",
+        videoURL:"/videos/floss.mov",
+        hearts: 200,
+        country: "us",
+    },
+    {
       id: "butter",
       title: "Butter",
       videoURL: "/videos/butter.mov",
