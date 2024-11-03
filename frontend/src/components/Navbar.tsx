@@ -23,13 +23,13 @@ export default function Navbar() {
                 <p className="font-bold text-2xl">Orbit</p>
             </a>
             
-            <div className="flex gap-x-4 items-center font-orbit font-bold">
+            <div className="flex gap-x-4 items-center font-bold">
                 <a href="/">Home</a>
                 <a href="/dashboard">Dashboard</a>
                 <a href="/explore">Explore</a>
                 {
                     (user !== null) ? (
-                        <button type="button" onClick={handleLogOut}>
+                        <button type="button" className="rounded-full" onClick={handleLogOut}>
                             <img src={user.photoURL!} width={32}/>
                         </button>
                     ):(
