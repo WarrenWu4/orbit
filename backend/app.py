@@ -11,7 +11,7 @@ app = Flask(__name__)
 CORS(app)
 
 load_dotenv()
-API_KEY = os.getenv("YOUTUBE_API_KEY")
+# API_KEY = os.getenv()
 
 # post request to process video
 @app.route("/video_process", methods=["POST"])

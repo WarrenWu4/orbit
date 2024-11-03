@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import { AuthProvider } from './providers/AuthProvider';
 import Play from './pages/Play';
+import Expiremental from './pages/Expiramental';
 
 const router = createBrowserRouter([
     {
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
     {
         path: "/play/:videoId",
         element: <Play/>
+    }, 
+    {
+        path: "/expiremental",
+        element: <Expiremental/>
     }
 ]);
 
