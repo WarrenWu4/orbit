@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import Page from "../layouts/Page";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   PoseLandmarker,
   FilesetResolver,
@@ -11,12 +11,18 @@ import { IoArrowBack } from "react-icons/io5"; // Import an icon for the back bu
 import "./Play.css"; // Import the CSS file
 import calculateScore from "../lib/scoreCalculator";
 import GeminiContentComponent from "../components/GeminiContentComponent";
+import { AuthContext } from "../context/AuthContext";
+import { addDoc, collection, doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase";
+import toast from "react-hot-toast";
 
 export default function Play() {
   const { videoId } = useParams();
   const navigate = useNavigate(); // Use navigate for going back
 
   const [score, setScore] = useState(0);
+  let angleData: number[][] = [];
+  const user = useContext(AuthContext);
 
   const webcamRef = useRef<HTMLVideoElement | null>(null);
   const videoCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -47,6 +53,23 @@ export default function Play() {
       }, 1000);
     }
   }, [isPlaying]);
+
+  async function handleSaveScore() {
+    try {
+      await addDoc(collection(db, "scores"), {
+        userId: user?.uid,
+        title: videoId,
+        score: score,
+        date: new Date().toISOString()
+      });
+
+      toast.success("Score has been 🚀");
+      resetPlay();
+    } catch (error) {
+      toast.error("Failed to save score");
+      console.log(error);
+    }
+  }
 
   let poseLandmarker: PoseLandmarker | undefined;
   let webcamRunning: boolean = false;
@@ -135,16 +158,14 @@ export default function Play() {
                 videoRef.current?.ended === false
               ) {
                 // every 5 seconds, update the score
-                if (
-                  Math.floor(videoRef.current!.currentTime / 5) !==
-                  Math.floor(lastScoreUpdateTime / 5)
-                ) {
-                  const score = calculateScore(
+                if (Math.floor(videoRef.current!.currentTime / 5) !== Math.floor(lastScoreUpdateTime / 5)) {
+                  const calcData = calculateScore(
                     vectorData,
                     result.landmarks,
                     videoRef.current!.currentTime
                   );
-                  setScore((prev) => Math.round(score) + prev);
+                  setScore((prev) => Math.round(calcData.scoreData)+prev);
+                  angleData = [...angleData, calcData.angleData];
                   lastScoreUpdateTime = videoRef.current!.currentTime;
                 }
               }
@@ -167,7 +188,25 @@ export default function Play() {
     detectFrame();
   }
 
+  // Dynamic video source based on videoId from route params
+  const videoIds = ["ballet", "afro", "footloose", "dynamite", "bhangra", "salsa", "haidilao", "samba", "floss", "butter", "drill", "rasputin"]
+  const [videoSrc, setVideoSrc] = useState((videoId !== undefined && videoIds.includes(videoId)) ? `/videos/${videoId}.mov`: "");
   useEffect(() => {
+    async function getVideoLink() {
+      console.log(videoSrc);
+      if (videoSrc !==  "") {
+        return;
+      }
+      if (videoId !== undefined) {
+        const docRef = doc(db, "videos", videoId!);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setVideoSrc(docSnap.data().videoURL);
+        }
+      }
+    }
+    getVideoLink();
+
     async function getVectorData() {
       const response = await fetch(`/vectors/${videoId}_pose_vectors.txt`);
       const text = await response.text();
@@ -201,22 +240,24 @@ export default function Play() {
     };
   }, []);
 
+  function resetPlay() {
+    setIsPlaying(false);
+    setFrames([]);
+    setScore(0);
+    if (videoRef.current && aheadVideoRef.current) {
+      videoRef.current.currentTime = 0;
+      aheadVideoRef.current.currentTime = 2;
+    }
+    setPlayModal(false);
+
+    setTimeout(() => {
+      setPlayAgain(false);
+    }, 3000);
+  }
+
   useEffect(() => {
     if (playAgain) {
-      setIsPlaying(false);
-      setCountDown(3);
-      setFrames([]);
-      setScore(0);
-      if (videoRef.current && aheadVideoRef.current) {
-        videoRef.current.currentTime = 0;
-        aheadVideoRef.current.currentTime = 2;
-      }
-      setPlayModal(false);
-
-      setTimeout(() => {
-        setPlayAgain(false);
-        handlePlayPause();
-      }, 3000);
+      resetPlay();
     }
   }, [playAgain]);
 
@@ -247,8 +288,6 @@ export default function Play() {
     }
   };
 
-  // Dynamic video source based on videoId from route params
-  const videoSrc = `/videos/${videoId}.mov`;
   useEffect(() => {
     if (videoRef.current && aheadVideoRef.current) {
       // Sync the play state
@@ -261,6 +300,7 @@ export default function Play() {
       });
 
       videoRef.current.addEventListener("ended", () => {
+        console.log(angleData);
         setPlayModal(true);
       });
 
@@ -520,10 +560,10 @@ export default function Play() {
             <div className="flex mr-4 flex-col border-2 border-cyan-500 rounded-lg">
               <div className="absolute inset-0 bg-gray-800 bg-opacity-[90%] flex flex-col items-center justify-center text-white rounded-lg">
                 <h1 className="text-2xl mb-4">Game Over</h1>
-                <div className="flex space-x-4">
+                <div className="flex space-x-4 mb-8">
                   <button
                     onClick={() => setPlayAgain(true)}
-                    className="px-4 py-2 border-4 border-cyan-500 rounded-lg bg-indigo-700 hover:bg-indigo-900 transition-all duration-300"
+                    className="px-4 py-2 border-4 border-cyan-500 rounded-lg bg-indigo-500 hover:bg-indigo-900 transition-all duration-300"
                   >
                     Play Again
                   </button>
@@ -532,10 +572,24 @@ export default function Play() {
                       onClick={() => setPlayModal(false)}
                       className="px-4 py-2 border-4 border-cyan-500 rounded-lg bg-pink-500 hover:bg-pink-700 transition-all duration-300"
                     >
-                      Another dance
+                      More dances
                     </button>
                   </a>
                 </div>
+                {
+                  user == null ?
+                    (<a href="/login">
+                      <button className="px-10 py-2 border-4 border-cyan-500 rounded-lg
+                        bg-gradient-to-b from-indigo-500 to-pink-500 subtle-neon-text hover:opacity-75 transition-all duration-300">
+                        Login in to Save Score
+                      </button>
+                    </a>) :
+                    (<button className="px-28 py-2 border-4 border-cyan-500 rounded-lg
+                        bg-gradient-to-b from-indigo-500 to-pink-500 subtle-neon-text hover:opacity-75 transition-all duration-300"
+                      onClick={handleSaveScore}>
+                      Save Score
+                    </button>)
+                }
               </div>
             </div>
           )}

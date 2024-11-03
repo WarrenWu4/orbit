@@ -8,7 +8,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 
 export default function Dashboard() {
 
-    const [content, setContent] = useState(<MainContent/>);
+    const [content, setContent] = useState(<MainContent />);
     const user = useContext(AuthContext);
 
     useEffect(() => {
@@ -17,13 +17,13 @@ export default function Dashboard() {
 
     return (
         <Page>
-            
+
             {
                 (user === null) ? (
                     <div className="w-full h-full grid place-items-center">
                         <h1 className="text-white">Please login first to use this feature</h1>
                     </div>
-                ): (
+                ) : (
                     <div className="w-full h-full flex gap-4">
                         <Sidebar
                             username={user.displayName!}
@@ -45,12 +45,12 @@ interface SidebarProps {
     setContent: React.Dispatch<React.SetStateAction<JSX.Element>>;
 }
 
-function Sidebar({username, setContent}: SidebarProps) {
+function Sidebar({ username, setContent }: SidebarProps) {
 
     const sections = [
-        {icon: <FaVideo />, title: "Upload Video", content: <MainContent/>},
-        {icon: <FaAtlas />, title: "Manage Videos", content: <ManageVideos/>},
-        {icon: <FaHistory />, title: "Dance History", content: <h1>Dance History</h1>},
+        { icon: <FaVideo />, title: "Upload Video", content: <MainContent /> },
+        { icon: <FaAtlas />, title: "Manage Videos", content: <ManageVideos /> },
+        { icon: <FaHistory />, title: "Dance History", content: <DanceHistory /> },
     ]
 
     return (
@@ -79,7 +79,7 @@ function MainContent() {
     const videoTitle = useRef<HTMLInputElement>(null);
     const countryRef = useRef<HTMLSelectElement>(null);
     const [countryNames, setCountryNames] = useState<string[]>([]);
-    const [countries, setCountries] = useState<{[name:string]: string}>({});
+    const [countries, setCountries] = useState<{ [name: string]: string }>({});
 
     function handleVideoUpload(e: React.FormEvent) {
         e.preventDefault();
@@ -91,40 +91,40 @@ function MainContent() {
         }
         const file = fileInput.files[0];
         const storageRef = ref(storage, `uploads/${file.name}`);
-  
+
         // Upload the file
-        const uploadTask = uploadBytesResumable(storageRef, file);uploadTask.on(
+        const uploadTask = uploadBytesResumable(storageRef, file); uploadTask.on(
             "state_changed",
             (snapshot) => {
-              // Progress calculation
-              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              console.log(`Upload is ${progress}% done`);
+                // Progress calculation
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log(`Upload is ${progress}% done`);
             },
             (error) => {
-              // Handle errors
-              console.error("Upload failed:", error);
+                // Handle errors
+                console.error("Upload failed:", error);
             },
             async () => {
-              // Upload completed successfully
-              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-              console.log("File available at", downloadURL);
-              // upload video link and data to firestore
-              await fetch("http://localhost:5000/video_process", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ 
-                    user: user!.uid,
-                    title: (videoTitle.current) ? videoTitle.current.value : "o shit",
-                    country: countries[countryVal!], 
-                    videoURL: downloadURL,
-                    hearts: 0,
-                    vectorData: []
-                }),
-              });
+                // Upload completed successfully
+                const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                console.log("File available at", downloadURL);
+                // upload video link and data to firestore
+                await fetch("http://localhost:5000/video_process", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        user: user!.uid,
+                        title: (videoTitle.current) ? videoTitle.current.value : "o shit",
+                        country: countries[countryVal!],
+                        videoURL: downloadURL,
+                        hearts: 0,
+                        vectorData: []
+                    }),
+                });
             }
-          );
+        );
         console.log("Video uploaded");
     }
 
@@ -138,7 +138,7 @@ function MainContent() {
             })
 
             setCountryNames(names);
-            const temp:{[name:string]:string} = {}
+            const temp: { [name: string]: string } = {}
             names.forEach((name, idx) => {
                 temp[name] = codes[idx];
             })
@@ -151,9 +151,11 @@ function MainContent() {
 
     return (
         <div>
-            <h1 className="text-2xl font-bold mb-4">
+            <h1 className="text-2xl font-bold">
                 Upload Your Dance Video
             </h1>
+
+            <div className="border-white border-2 py-1 my-2"></div>
 
             <form className="flex flex-col gap-y-4" onSubmit={handleVideoUpload}>
 
@@ -197,7 +199,7 @@ function ManageVideos() {
     const user = useContext(AuthContext);
 
     useEffect(() => {
-        
+
         async function fetchVideos() {
             const tempVideos: any[] = [];
             const q = query(collection(db, "videos"), where("user", "==", user!.uid));
@@ -212,18 +214,20 @@ function ManageVideos() {
         }
 
         fetchVideos();
-    
+
     }, [])
 
     return (
         <div>
 
-            <h1 className="text-2xl font-bold mb-4">
-                Upload Your Dance Video
+            <h1 className="text-2xl font-bold">
+                Manage Dance Videos
             </h1>
 
+            <div className="border-white border-2 py-1 my-2"></div>
+
             {videos.map((video) => {
-                return(
+                return (
                     <div key={video.docRefId} className="w-full p-4 flex justify-between">
                         <h1>{video.title}</h1>
                         <div>
@@ -233,6 +237,56 @@ function ManageVideos() {
                 )
             })}
 
+        </div>
+    )
+}
+
+function DanceHistory() {
+    const user = useContext(AuthContext);
+
+    const [scores, setScore] = useState<any[]>([{
+        date: "adahd",
+        title: "Floss",
+        score: "1234"
+    }]);
+
+    useEffect(() => {
+        async function fetchScores() {
+            const score_data: any[] = [];
+            const q = query(collection(db, "scores"), where("userId", "==", user!.uid));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                score_data.push(doc.data());
+            });
+            console.log(score_data);
+            setScore(score_data);
+        }
+
+        fetchScores();
+    });
+
+    return (
+        <div>
+            <h1 className="text-2xl font-bol">Dance History</h1>
+            <div className="border-white border-2 py-1 my-2"></div>
+            <div className="flex flex-row gap-8 font-bold mb-2">
+                <span className="text-slate-300 w-1/3">Date</span>
+                <span className="w-1/3">Title</span>
+                <span className="w-1/3">Score</span>
+                <span className="pr-10">Replay</span>
+            </div>
+            <div className="flex flex-col gap-2">
+                {scores.map((item, index) => (
+                    <div key={index} className="flex flex-row">
+                        <div className="flex flex-row flex-1 gap-8">
+                            <span className="text-slate-300 break-words w-1/3">{item.date}</span>
+                            <span className="break-words w-1/3">{item.title}</span>
+                            <span className="break-words w-1/3">{item.score}</span>
+                        </div>
+                        <a href={"/play/" + item.title}><button>Play Again</button></a>
+                    </div>
+                ))}
+            </div>
         </div>
     )
 }
