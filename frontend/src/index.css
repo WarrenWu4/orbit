@@ -77,21 +77,34 @@ button {
 }
 
 .bg-gradient-1 {
-  background: rgb(250, 170, 80);
+  position: relative;
   background: linear-gradient(
     90deg,
     rgba(250, 170, 80, 1) 0%,
     rgba(225, 124, 183, 1) 100%
   );
+  z-index: 1;
 }
 
-.bg-gradient-1:hover {
-  background: rgb(225, 124, 183);
-  background: linear-gradient(
-    90deg,
-    rgba(225, 124, 183, 1) 0%,
-    rgba(250, 170, 80, 1) 100%
+.bg-gradient-1::before {
+  position: absolute;
+  content: '';
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-image: linear-gradient(
+    to bottom,
+    hsl(344, 100%, 50%),
+    hsl(31, 100%, 40%)
   );
+  z-index: -1;
+  transition: opacity 0.5s linear;
+  opacity: 0;
+}
+
+.bg-gradient-1:hover::before {
+  opacity: 1;
 }
 
 body {

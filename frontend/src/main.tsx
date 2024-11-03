@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import { AuthProvider } from './providers/AuthProvider';
 import Play from './pages/Play';
+import Expiremental from './pages/Expiramental';
 import { Toaster } from 'react-hot-toast';
 
 const router = createBrowserRouter([
@@ -35,16 +36,18 @@ const router = createBrowserRouter([
     {
         path: "/play/:videoId",
         element: <Play />
+    },
+    {
+        path: "/expiremental",
+        element: <Expiremental />
     }
 ]);
 
 createRoot(document.getElementById('root')!).render(
-    <StrictMode>
-        <AuthProvider>
-            <Toaster
-                position='top-center'
-                reverseOrder={false} />
-            <RouterProvider router={router} />
-        </AuthProvider>
-    </StrictMode>,
+    <AuthProvider>
+        <Toaster
+            position='top-center'
+            reverseOrder={false} />
+        <RouterProvider router={router} />
+    </AuthProvider>
 )

@@ -1,17 +1,17 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from dotenv import load_dotenv
-import os
 import cv2
 import mediapipe as mp
-import sys
+import firebase_admin
+from firebase_admin import credentials, firestore
 
 app = Flask(__name__)
 
 CORS(app)
 
-load_dotenv()
-API_KEY = os.getenv("YOUTUBE_API_KEY")
+cred = credentials.Certificate("./blackbox-admin-sdk.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 # post request to process video
 @app.route("/video_process", methods=["POST"])
@@ -19,14 +19,21 @@ def video_process():
     data = request.get_json()
     
     video_path = data["videoURL"]
-    annoate_video(video_path)
+    try:
+        vectorData = annoate_video(video_path)
+        data["vectorData"] = vectorData
+    except Exception as e:
+        return jsonify({"message": f"Failed to process video\nError: {e}"}), 500
     
-    
+    try:
+        db.collection("videos").add(data)
+    except Exception as e:
+        return jsonify({"message": f"Failed to upload to firebase\nError: {e}"}), 500
     
     return jsonify({"message": "success"}), 200
 
 def annoate_video(video_path):
-    res = ""
+    data = ""
     
     mp_drawing = mp.solutions.drawing_utils
     mp_pose = mp.solutions.pose
@@ -48,19 +55,18 @@ def annoate_video(video_path):
     fps = int(cap.get(cv2.CAP_PROP_FPS))  # Get the FPS of the input video
 
     out_filename = f'video_annotated.mp4'  # Ensure the output is .mp4 for compatibility
-    text_filename = f'video_pose_vectors.txt'
     out = cv2.VideoWriter(out_filename, cv2.VideoWriter_fourcc(
         *'avc1'), fps, (frame_width, frame_height))  # Use 'H.264' codec for browser compatibility
 
     # write to array
-    with open(text_filename, 'w') as text_file:
-        frame_count = 0
+    frame_count = 0
 
-        while cap.isOpened():
-            ret, image = cap.read()
-            if not ret:
-                break
+    while cap.isOpened():
+        ret, image = cap.read()
+        if not ret:
+            break
 
+        if (frame_count % fps == 0):
             image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
             image.flags.writeable = False
             results = pose.process(image)
@@ -84,15 +90,16 @@ def annoate_video(video_path):
                     vector.extend([landmark.x, landmark.y, landmark.z])
 
                 # Write the vector in the format [x1, y1, z1, x2, y2, z2, ...]
-                text_file.write(f'{vector}\n')
-            
+                data += f'{vector}\n'
+        
+        if frame_count % fps == 0:
             out.write(image)
-            frame_count += 1
+        frame_count += 1
 
     pose.close()
     cap.release()
     out.release()
-
+    return data
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True, host="localhost", port=5000)
