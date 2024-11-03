@@ -14,6 +14,8 @@ export default function Play() {
   const { videoId } = useParams();
   const navigate = useNavigate(); // Use navigate for going back
 
+  const [score, setScore] = useState(0);
+
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const webcamRef = useRef<HTMLVideoElement | null>(null);
   const videoCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -261,31 +263,35 @@ export default function Play() {
             )}
           </div>
 
-          {/* Webcam Video with Pose Detection Overlay */}
-          <div className="videoView" style={{ height: "450px" }}>
-            <video
-              id="webcam"
-              ref={webcamRef}
-              className="w-full h-full"
-              autoPlay
-              playsInline
-              muted
-              style={{ objectFit: "cover" }}
-            />
-            <canvas
-              id="webcam_output_canvas"
-              ref={webcamCanvasRef}
-              className="canvas output_canvas"
-              style={{
-                height: "100%",
-                width: "100%",
-                position: "absolute",
-                top: 0,
-                left: 0,
-              }}
-            />
-          </div>
+        {/* Webcam Video with Pose Detection Overlay */}
+        <div className="videoView" style={{ height: "500px" }}>
+          <video
+            id="webcam"
+            ref={webcamRef}
+            className="w-full h-full"
+            autoPlay
+            playsInline
+            muted
+            style={{ objectFit: "cover" }}
+          />
+          <canvas
+            id="webcam_output_canvas"
+            ref={webcamCanvasRef}
+            className="canvas output_canvas"
+            style={{
+              height: "100%",
+              width: "100%",
+              position: "absolute",
+              top: 0,
+              left: 0,
+            }}
+          />
         </div>
+      </div>
+
+      <div className="text-xl font-bold">
+        Score: {score}
+      </div>
 
         {/* Controls */}
         <div className="controls flex justify-between items-center p-2 bg-gray-800 rounded-lg text-white mb-4">
