@@ -210,54 +210,56 @@ export default function Explore() {
 function VideoCard(props: any) {
   const [isHovered, setIsHovered] = useState(false);
   return (
-    <div
-      className="flex flex-col border-4 border-white px-4 py-2 hover:shadow-arcade hover:cursor-pointer relative gap-1"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className="absolute top-[-16px] right-[-16px] border-8 border-white"></div>
-      <div className="flex flex-row items-center gap-2">
-        <img src="/musical-note.png" alt="Music note" className="w-[15px]" />
-        <img
-          className="ml-2 w-[30px] h-[20px]"
-          src={`https://flagcdn.com/w20/${props.country}.png`}
-          alt={`${props.country} flag`}
-        />
-        {/* You can also store local flags if you prefer */}
-        {/* <img src={`/flags/${props.country}.png`} alt="Country flag" className="w-[30px]" /> */}
-        <a
-          href={`/play/${props.videoId}`}
-          className="flex flex-row gap-2 items-center underline text-sm ml-auto"
-        >
-          try it!
-          <div className="w-[25px]">
-            <img src="/joystick.png" alt="play" />
-          </div>
-        </a>
-      </div>
+    <a href={`/play/${props.videoId}`}>
+      <div
+        className="flex flex-col border-4 border-white px-4 py-2 hover:shadow-arcade hover:cursor-pointer relative gap-1"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div className="absolute top-[-16px] right-[-16px] border-8 border-white"></div>
+        <div className="flex flex-row items-center gap-2">
+          <img src="/musical-note.png" alt="Music note" className="w-[15px]" />
+          <img
+            className="ml-2 w-[30px] h-[20px]"
+            src={`https://flagcdn.com/w20/${props.country}.png`}
+            alt={`${props.country} flag`}
+          />
+          {/* You can also store local flags if you prefer */}
+          {/* <img src={`/flags/${props.country}.png`} alt="Country flag" className="w-[30px]" /> */}
+          <a
+            href={`/play/${props.videoId}`}
+            className="flex flex-row gap-2 items-center underline text-sm ml-auto"
+          >
+            try it!
+            <div className="w-[25px]">
+              <img src="/joystick.png" alt="play" />
+            </div>
+          </a>
+        </div>
 
-      <div className="video-container relative overflow-x-hidden">
-        <ReactPlayer
-          url={props.videoUrl}
-          playing={isHovered}
-          height="100%"
-          style={{ aspectRatio: "16/9", transform: "translateX(-30%)" }}
-        />
+        <div className="video-container relative overflow-x-hidden">
+          <ReactPlayer
+            url={props.videoUrl}
+            playing={isHovered}
+            height="100%"
+            style={{ aspectRatio: "16/9", transform: "translateX(-30%)" }}
+          />
 
-        {!isHovered && (
-          <div className="absolute z-2 inset-0 bg-gray-700 bg-opacity-75 flex flex-col items-center justify-center text-white">
-            <img src="/tap.png" alt="" />
-            <span>Hover Me</span>
-          </div>
-        )}
+          {!isHovered && (
+            <div className="absolute z-2 inset-0 bg-gray-700 bg-opacity-75 flex flex-col items-center justify-center text-white">
+              <img src="/tap.png" alt="" />
+              <span>Hover Me</span>
+            </div>
+          )}
+        </div>
+        <div>{props.videoTitle}</div>
+        <div className="w-full flex flex-row">
+          <span>
+            <img src="" alt="" />
+            {props.hearts} Hearts
+          </span>
+        </div>
       </div>
-      <div>{props.videoTitle}</div>
-      <div className="w-full flex flex-row">
-        <span>
-          <img src="" alt="" />
-          {props.hearts} Hearts
-        </span>
-      </div>
-    </div>
+    </a>
   );
 }
