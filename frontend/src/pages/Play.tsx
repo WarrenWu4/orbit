@@ -20,6 +20,7 @@ export default function Play() {
   const navigate = useNavigate(); // Use navigate for going back
 
   const [score, setScore] = useState(0);
+  let angleData: number[][] = [];
   const user = useContext(AuthContext);
 
   const webcamRef = useRef<HTMLVideoElement | null>(null);
@@ -158,12 +159,13 @@ export default function Play() {
 
                 // every 5 seconds, update the score
                 if (Math.floor(videoRef.current!.currentTime / 5) !== Math.floor(lastScoreUpdateTime / 5)) {
-                  const score = calculateScore(
+                  const calcData = calculateScore(
                     vectorData,
                     result.landmarks,
                     videoRef.current!.currentTime
                   );
-                  setScore((prev) => Math.round(score)+prev);
+                  setScore((prev) => Math.round(calcData.scoreData)+prev);
+                  angleData = [...angleData, calcData.angleData];
                   lastScoreUpdateTime = videoRef.current!.currentTime;
                 }
 
@@ -283,6 +285,7 @@ export default function Play() {
       });
 
       videoRef.current.addEventListener("ended", () => {
+        console.log(angleData);
         setPlayModal(true);
       });
 
