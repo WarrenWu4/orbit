@@ -9,6 +9,7 @@ import {
 import { FaPlay, FaPause, FaTachometerAlt } from "react-icons/fa";
 import { IoArrowBack } from "react-icons/io5"; // Import an icon for the back button
 import "./Play.css"; // Import the CSS file
+import calculateScore from "../lib/scoreCalculator";
 
 export default function Play() {
   const { videoId } = useParams();
@@ -86,7 +87,7 @@ export default function Play() {
     canvasCtx.clearRect(0, 0, canvasCtx.canvas.width, canvasCtx.canvas.height);
 
     if (result.landmarks && result.landmarks.length > 0) {
-      console.log(`Drawing ${result.landmarks.length} landmarks on ${source}`);
+      // console.log(`Drawing ${result.landmarks.length} landmarks on ${source}`);
       const drawingUtils = new DrawingUtils(canvasCtx);
 
       for (const landmark of result.landmarks) {
@@ -103,7 +104,7 @@ export default function Play() {
     }
   }
 
-  async function predictWebcam() {
+  async function predictWebcam(vectorData:string) {
     if (!poseLandmarker || !webcamRef.current || !webcamCanvasRef.current)
       return;
 
@@ -117,6 +118,13 @@ export default function Play() {
         (result) => {
           if (result && result.landmarks) {
             // console.log("Webcam Pose Vectors:", result.landmarks);
+            // get the nearest time frame
+            if (videoRef) {
+              if (videoRef.current!.currentTime > 0 && videoRef.current!.paused === false && videoRef.current?.ended === false) {
+                const score = calculateScore(vectorData, result.landmarks, currentTime);
+                setScore(Math.round(score));
+              }
+            }
 
             // Draw landmarks and connections on the canvas
             drawResults(result, canvasCtx!, "webcam");
@@ -136,18 +144,24 @@ export default function Play() {
   }
 
   useEffect(() => {
-    loadPoseLandmarker().then(() => {
-      if (videoRef.current) {
-        videoRef.current.addEventListener("loadeddata", () => {
-          resizeCanvasToMatchVideo(videoRef, videoCanvasRef);
-        });
 
-        videoRef.current.addEventListener("timeupdate", () => {
-          setCurrentTime(videoRef.current!.currentTime);
-        });
-      }
-      openCamera();
-    });
+    async function getVectorData() {
+      const response = await fetch("/rasputin_pose_vectors.txt");
+      const text = await response.text();
+      loadPoseLandmarker().then(() => {
+        if (videoRef.current) {
+          videoRef.current.addEventListener("loadeddata", () => {
+            resizeCanvasToMatchVideo(videoRef, videoCanvasRef);
+          });
+  
+          videoRef.current.addEventListener("timeupdate", () => {
+            setCurrentTime(videoRef.current!.currentTime);
+          });
+        }
+        openCamera(text);
+      });
+    }
+    getVectorData();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.code === "Space") {
@@ -164,7 +178,7 @@ export default function Play() {
     };
   }, []);
 
-  async function openCamera() {
+  async function openCamera(vectorData:string) {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
@@ -177,7 +191,7 @@ export default function Play() {
 
         webcamRef.current.addEventListener("loadeddata", () => {
           resizeCanvasToMatchVideo(webcamRef, webcamCanvasRef);
-          predictWebcam();
+          predictWebcam(vectorData);
         });
       }
     } catch (error) {
