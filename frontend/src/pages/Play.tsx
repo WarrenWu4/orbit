@@ -190,6 +190,9 @@ export default function Play() {
     }
   };
 
+  // Dynamic video source based on videoId from route params
+  const videoSrc = `/videos/${videoId}.mov`;
+
   return (
     <Page>
       <div className="flex flex-row justify-between space-x-4">
@@ -198,7 +201,7 @@ export default function Play() {
           <video
             id="danceVideo"
             ref={videoRef}
-            src="/videos/dynamite.mov" // Source for the dance video
+            src={videoSrc} // Use dynamic video source
             className="w-full h-full"
             loop
             style={{ objectFit: "cover" }}
