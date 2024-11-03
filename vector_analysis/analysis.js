@@ -84,10 +84,11 @@ const MAX_SCORE = 1000;
 
 function score(angle_btw) {
     const normalize_angle = angle_btw.map(angle => angle / Math.PI);
+    const calc_angle = normalize_angle.map(angle => Math.exp(-2 * angle));
     const weights = [0.125, 0.10, 0.05, 0.10, 0.125, 0.05, 0.05, 0.05, 0.05, 0.05, 0.125, 0.125].map(weight => weight * MAX_SCORE);
-    const weighted_sum = normalize_angle.reduce((sum, angle, i) => sum + angle * weights[i], 0);
+    const weighted_sum = calc_angle.reduce((sum, angle, i) => sum + angle * weights[i], 0);
 
-    return MAX_SCORE - weighted_sum;
+    return weighted_sum;
 }
 
 const vid1 = groupVertices(getVertices("ras_pose_vectors.txt"));

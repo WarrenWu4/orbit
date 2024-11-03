@@ -1,18 +1,18 @@
-function getVertices(vectorData:string) {
+function getVertices(vectorData: string) {
     // Read the file synchronously and split into lines
     const lines = vectorData.split('\n').filter(Boolean);
 
-    const res:any[] = [];
+    const res: any[] = [];
     lines.forEach(line => {
         line = line.trim();
         // Remove first and last character and split by commas
         const values = line.slice(1, -1).split(',');
-        
+
         const newArr = [];
         for (let i = 0; i < values.length; i += 3) {
             newArr.push([
-                parseFloat(values[i]), 
-                parseFloat(values[i + 1]), 
+                parseFloat(values[i]),
+                parseFloat(values[i + 1]),
                 parseFloat(values[i + 2])
             ]);
         }
@@ -22,7 +22,7 @@ function getVertices(vectorData:string) {
     return res;
 }
 
-function calVector(p1:any[], p2:any[]) {
+function calVector(p1: any[], p2: any[]) {
     // Calculates the vector from p1 to p2
     return [
         p2[0] - p1[0],
@@ -31,7 +31,7 @@ function calVector(p1:any[], p2:any[]) {
     ];
 }
 
-function calVector2(p1:Vector, p2:Vector) {
+function calVector2(p1: Vector, p2: Vector) {
     // Calculates the vector from p1 to p2
     return {
         x: p2.x - p1.x,
@@ -40,8 +40,8 @@ function calVector2(p1:Vector, p2:Vector) {
     };
 }
 
-function groupVertices2(data:Vector[]) {
-    const res:any[] = [];
+function groupVertices2(data: Vector[]) {
+    const res: any[] = [];
     res.push(calVector2(data[14], data[16]));
     res.push(calVector2(data[12], data[14]));
     res.push(calVector2(data[11], data[12]));
@@ -58,14 +58,14 @@ function groupVertices2(data:Vector[]) {
     return res;
 }
 
-function groupVertices(data:any[]) {
+function groupVertices(data: any[]) {
     /*
     Order of points:
       left_wrist_elbow, left_elbow_shoulder, shoulder_shoulder,
       right_elbow_shoulder, right_wrist_elbow, left_torso, right_torso, hips,
       left_hip_knee, right_hip_knee, left_knee_feet, right_knee_feet
     */
-    const res:any[] = [];
+    const res: any[] = [];
 
     data.forEach(moment => {
         const newArr = [];
@@ -87,7 +87,7 @@ function groupVertices(data:any[]) {
     return res;
 }
 
-function unitVector(vector:any[]) {
+function unitVector(vector: any[]) {
     const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
     return {
         x: vector[0] / magnitude,
@@ -96,7 +96,7 @@ function unitVector(vector:any[]) {
     };
 }
 
-function unitVector2(vector:Vector) {
+function unitVector2(vector: Vector) {
     const magnitude = Math.sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
     return {
         x: vector.x / magnitude,
@@ -111,7 +111,7 @@ interface Vector {
     z: number;
 }
 
-function angleBetween(v1:any[], v2:Vector) {
+function angleBetween(v1: any[], v2: Vector) {
     const v1_u = unitVector(v1);
     const v2_u = unitVector2(v2);
 
@@ -122,22 +122,23 @@ function angleBetween(v1:any[], v2:Vector) {
 }
 const MAX_SCORE = 1000;
 
-function score(angle_btw:any[]) {
+function score(angle_btw: any[]) {
     const normalize_angle = angle_btw.map(angle => angle / Math.PI);
-    const weights = [0.125, 0.10, 0.05, 0.10, 0.125, 0.05, 0.05, 0.05, 0.05, 0.05, 0.125, 0.125].map(weight => weight * MAX_SCORE);
-    const weighted_sum = normalize_angle.reduce((sum, angle, i) => sum + angle * weights[i], 0);
+    const calc_angle = normalize_angle.map(angle => Math.exp(-2 * angle));
+    const weights = [0.125, 0.10, 0.05, 0.10, 0.125, 0.0, 0.0, 0.05, 0.05, 0.05, 0.125, 0.125].map(weight => weight * MAX_SCORE);
+    const weighted_sum = calc_angle.reduce((sum, angle, i) => sum + angle * weights[i], 0);
 
-    return MAX_SCORE - weighted_sum;
+    return weighted_sum;
 }
 
-export default function calculateScore(vectorData:string, currentData:any[], currentTime:number) {
+export default function calculateScore(vectorData: string, currentData: any[], currentTime: number) {
     // console.log(vectorData);
     // console.log(currentData.flat());
     const vid1 = groupVertices(getVertices(vectorData));
     const vid2 = groupVertices2(currentData.flat());
     const data = [];
     const integerTime = Math.round(currentTime);
-    
+
     for (let i = 0; i < 12; i++) {
         data.push(angleBetween(vid1[integerTime][i], vid2[i]));
     }
