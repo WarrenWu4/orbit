@@ -15,6 +15,7 @@ import { AuthContext } from "../context/AuthContext";
 import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import toast from "react-hot-toast";
+import { generateContent } from "../components/GeminiScoreComponent";
 
 export default function Play() {
   const { videoId } = useParams();
@@ -34,6 +35,7 @@ export default function Play() {
   const [frames, setFrames] = useState<string[]>([]);
   const [playAgain, setPlayAgain] = useState(false);
   const [playModal, setPlayModal] = useState(false);
+  const [saveAngleData, setSaveAngleData] = useState<number[][]>([]);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const aheadVideoRef = useRef<HTMLVideoElement | null>(null); // Off-screen video element
@@ -56,11 +58,22 @@ export default function Play() {
 
   async function handleSaveScore() {
     try {
+      console.log(saveAngleData);
+      if (saveAngleData.length == 0 || !videoId) {
+        toast.error("No data was recorded. Please Try again")
+        return
+      }
+
+      const generatedNote = await generateContent({
+        danceData: saveAngleData,
+      })
+
       await addDoc(collection(db, "scores"), {
         userId: user?.uid,
         title: videoId,
         score: score,
-        date: new Date().toISOString()
+        date: new Date().toISOString(),
+        notes: generatedNote
       });
 
       toast.success("Score has been 🚀");
@@ -164,7 +177,7 @@ export default function Play() {
                     result.landmarks,
                     videoRef.current!.currentTime
                   );
-                  setScore((prev) => Math.round(calcData.scoreData)+prev);
+                  setScore((prev) => Math.round(calcData.scoreData) + prev);
                   angleData = [...angleData, calcData.angleData];
                   lastScoreUpdateTime = videoRef.current!.currentTime;
                 }
@@ -190,11 +203,11 @@ export default function Play() {
 
   // Dynamic video source based on videoId from route params
   const videoIds = ["ballet", "afro", "footloose", "dynamite", "bhangra", "salsa", "haidilao", "samba", "floss", "butter", "drill", "rasputin"]
-  const [videoSrc, setVideoSrc] = useState((videoId !== undefined && videoIds.includes(videoId)) ? `/videos/${videoId}.mov`: "");
+  const [videoSrc, setVideoSrc] = useState((videoId !== undefined && videoIds.includes(videoId)) ? `/videos/${videoId}.mov` : "");
   useEffect(() => {
     async function getVideoLink() {
       console.log(videoSrc);
-      if (videoSrc !==  "") {
+      if (videoSrc !== "") {
         return;
       }
       if (videoId !== undefined) {
@@ -301,6 +314,8 @@ export default function Play() {
 
       videoRef.current.addEventListener("ended", () => {
         console.log(angleData);
+        setSaveAngleData(angleData);
+        console.log(saveAngleData);
         setPlayModal(true);
       });
 
@@ -586,7 +601,10 @@ export default function Play() {
                     </a>) :
                     (<button className="px-28 py-2 border-4 border-cyan-500 rounded-lg
                         bg-gradient-to-b from-indigo-500 to-pink-500 subtle-neon-text hover:opacity-75 transition-all duration-300"
-                      onClick={handleSaveScore}>
+                      onClick={(event) => {
+                        event.preventDefault();
+                        handleSaveScore();
+                      }}>
                       Save Score
                     </button>)
                 }
@@ -609,11 +627,9 @@ export default function Play() {
                 disabled={isPlaying}
                 key={speed}
                 onClick={() => handleSpeedChange(speed)}
-                className={`btn p-2 rounded-full ${
-                  playbackRate === speed ? "bg-purple-500" : "bg-gray-700"
-                } ${
-                  !isPlaying && "hover:bg-purple-600"
-                } flex items-center transition-all duration-300`}
+                className={`btn p-2 rounded-full ${playbackRate === speed ? "bg-purple-500" : "bg-gray-700"
+                  } ${!isPlaying && "hover:bg-purple-600"
+                  } flex items-center transition-all duration-300`}
               >
                 <FaTachometerAlt className="mr-1" />
                 {speed}x
@@ -630,7 +646,7 @@ export default function Play() {
           />
         </div>
         <div>
-          <GeminiContentComponent danceName={videoId + " dance"}/>
+          <GeminiContentComponent danceName={videoId + " dance"} />
         </div>
       </div>
     </Page>

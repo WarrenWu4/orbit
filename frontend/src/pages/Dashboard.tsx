@@ -273,7 +273,8 @@ function DanceHistory() {
             querySnapshot.forEach((doc) => {
                 score_data.push(doc.data());
             });
-            // console.log(score_data);
+            // Sort scores by date
+            score_data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
             setScore(score_data);
         }
 
