@@ -196,7 +196,7 @@ export default function Explore() {
 
         <div className="grid grid-cols-3 gap-y-16 gap-x-16 mx-16">
           {videos
-            .sort((a, b) => a.title.localeCompare(b.title)) // Sort videos alphabetically by title
+            .sort((a, b) => a.id.localeCompare(b.id)) // Sort videos alphabetically by title
             .map((video, index) => (
               <VideoCard
                 key={index}
