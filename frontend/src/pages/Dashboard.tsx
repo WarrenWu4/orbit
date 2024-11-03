@@ -79,7 +79,7 @@ function MainContent() {
     const videoTitle = useRef<HTMLInputElement>(null);
     const countryRef = useRef<HTMLSelectElement>(null);
     const [countryNames, setCountryNames] = useState<string[]>([]);
-    const [countries, setCountries] = useState<{[name:string]: string}>({});
+    const [countries, setCountries] = useState<{ [name: string]: string }>({});
 
     function handleVideoUpload(e: React.FormEvent) {
         e.preventDefault();
@@ -105,24 +105,24 @@ function MainContent() {
                 console.error("Upload failed:", error);
             },
             async () => {
-              // Upload completed successfully
-              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-              console.log("File available at", downloadURL);
-              // upload video link and data to firestore
-              await fetch("http://localhost:5000/video_process", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ 
-                    user: user!.uid,
-                    title: (videoTitle.current) ? videoTitle.current.value : "o shit",
-                    country: countries[countryVal!], 
-                    videoURL: downloadURL,
-                    hearts: 0,
-                    vectorData: []
-                }),
-              });
+                // Upload completed successfully
+                const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                console.log("File available at", downloadURL);
+                // upload video link and data to firestore
+                await fetch("http://localhost:5000/video_process", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        user: user!.uid,
+                        title: (videoTitle.current) ? videoTitle.current.value : "o shit",
+                        country: countries[countryVal!],
+                        videoURL: downloadURL,
+                        hearts: 0,
+                        vectorData: []
+                    }),
+                });
             }
         );
         console.log("Video uploaded");
@@ -138,7 +138,7 @@ function MainContent() {
             })
 
             setCountryNames(names);
-            const temp:{[name:string]:string} = {}
+            const temp: { [name: string]: string } = {}
             names.forEach((name, idx) => {
                 temp[name] = codes[idx];
             })
@@ -253,13 +253,13 @@ function DanceHistory() {
     useEffect(() => {
         async function fetchScores() {
             const score_data: any[] = [];
-            const q = query(collection(db, "scores"), where("user", "==", user!.uid));
+            const q = query(collection(db, "scores"), where("userId", "==", user!.uid));
             const querySnapshot = await getDocs(q);
             querySnapshot.forEach((doc) => {
                 score_data.push(doc.data());
             });
             console.log(score_data);
-            // setScore(score_data);
+            setScore(score_data);
         }
 
         fetchScores();
@@ -270,20 +270,23 @@ function DanceHistory() {
             <h1 className="text-2xl font-bol">Dance History</h1>
             <div className="border-white border-2 py-1 my-2"></div>
             <div className="flex flex-row gap-8 font-bold mb-2">
-                <span className="text-gray-400">Date</span>
-                <span>Title</span>
-                <span>Score</span>
+                <span className="text-slate-300 w-1/3">Date</span>
+                <span className="w-1/3">Title</span>
+                <span className="w-1/3">Score</span>
+                <span className="pr-10">Replay</span>
             </div>
-            {scores.map((item, index) => (
-                <div key={index} className="flex flex-row">
-                    <div className="flex flex-row flex-1 gap-8">
-                        <span className="text-gray-400">{item.date}</span>
-                        <span>{item.title}</span>
-                        <span>{item.score}</span>
+            <div className="flex flex-col gap-2">
+                {scores.map((item, index) => (
+                    <div key={index} className="flex flex-row">
+                        <div className="flex flex-row flex-1 gap-8">
+                            <span className="text-slate-300 break-words w-1/3">{item.date}</span>
+                            <span className="break-words w-1/3">{item.title}</span>
+                            <span className="break-words w-1/3">{item.score}</span>
+                        </div>
+                        <a href={"/play/" + item.title}><button>Play Again</button></a>
                     </div>
-                    <a href={"/play" + item.title}><button>Play Again</button></a>
-                </div>
-            ))}
+                ))}
+            </div>
         </div>
     )
 }
