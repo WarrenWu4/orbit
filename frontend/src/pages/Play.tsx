@@ -116,7 +116,7 @@ export default function Play() {
         performance.now(),
         (result) => {
           if (result && result.landmarks) {
-            console.log("Webcam Pose Vectors:", result.landmarks);
+            // console.log("Webcam Pose Vectors:", result.landmarks);
 
             // Draw landmarks and connections on the canvas
             drawResults(result, canvasCtx!, "webcam");
@@ -229,13 +229,22 @@ export default function Play() {
         </div>
 
         {/* Title */}
-        <h1 className="text-white text-center font-bold text-3xl my-6">
-          {videoId?.toUpperCase()}
-        </h1>
+        <div className="flex flex-row justify-between">
+          <h1 className="text-center font-bold text-3xl my-3">
+            <span className="text-transparent bg-clip-text bg-gradient-to-b from-indigo-500 to-pink-500">
+              {videoId?.toUpperCase()}
+            </span>
+          </h1>
+          <h1 className="text-center font-bold text-3xl my-3">
+            <span className="text-transparent bg-clip-text bg-gradient-to-b from-indigo-500 to-pink-500">
+              Score: {score.toString().padStart(6, '0')}
+            </span>
+          </h1>
+        </div>
 
         <div className="flex flex-row justify-between space-x-4 my-6">
           {/* Dance/Comparison Video with Pose Detection Overlay */}
-          <div className="videoView relative" style={{ height: "450px" }}>
+          <div className="videoView relative" style={{ height: "500px" }}>
             <video
               id="danceVideo"
               ref={videoRef}
@@ -263,35 +272,31 @@ export default function Play() {
             )}
           </div>
 
-        {/* Webcam Video with Pose Detection Overlay */}
-        <div className="videoView" style={{ height: "500px" }}>
-          <video
-            id="webcam"
-            ref={webcamRef}
-            className="w-full h-full"
-            autoPlay
-            playsInline
-            muted
-            style={{ objectFit: "cover" }}
-          />
-          <canvas
-            id="webcam_output_canvas"
-            ref={webcamCanvasRef}
-            className="canvas output_canvas"
-            style={{
-              height: "100%",
-              width: "100%",
-              position: "absolute",
-              top: 0,
-              left: 0,
-            }}
-          />
+          {/* Webcam Video with Pose Detection Overlay */}
+          <div className="videoView" style={{ height: "500px" }}>
+            <video
+              id="webcam"
+              ref={webcamRef}
+              className="w-full h-full"
+              autoPlay
+              playsInline
+              muted
+              style={{ objectFit: "cover" }}
+            />
+            <canvas
+              id="webcam_output_canvas"
+              ref={webcamCanvasRef}
+              className="canvas output_canvas"
+              style={{
+                height: "100%",
+                width: "100%",
+                position: "absolute",
+                top: 0,
+                left: 0,
+              }}
+            />
+          </div>
         </div>
-      </div>
-
-      <div className="text-xl font-bold">
-        Score: {score}
-      </div>
 
         {/* Controls */}
         <div className="controls flex justify-between items-center p-2 bg-gray-800 rounded-lg text-white mb-4">
