@@ -54,17 +54,17 @@ export default function Login() {
 
     return (
         <Page>
-            
+
             <div className="w-full h-full grid place-items-center">
 
                 <form className="p-4 border-4 border-white flex flex-col gap-y-2" onSubmit={handleLogin}>
-                    
-                    <h1 className="text-white font-bold text-3xl"> Login to Orbit</h1>
-                    
-                    <input className="p-2 my-2 border-2 border-white" type="text" placeholder="Username" />
 
-                    <input className="p-2 my-2 border-2 border-white" type="password" placeholder="Password" />
-                    
+                    <h1 className="text-white font-bold text-3xl"> Login to Orbit</h1>
+
+                    <input className="p-2 my-2 border-2 border-white text-black" ref={emailRef} type="text" placeholder="Username" />
+
+                    <input className="p-2 my-2 border-2 border-white text-black" ref={passwordRef} type="password" placeholder="Password" />
+
                     <button className="w-full p-2 my-2 bg-blue-500 text-white" type="submit">Login</button>
 
                     <div className="text-center">
