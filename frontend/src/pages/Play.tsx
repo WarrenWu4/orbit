@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Page from "../layouts/Page";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -7,11 +7,12 @@ import {
   DrawingUtils,
 } from "@mediapipe/tasks-vision";
 import { FaPlay, FaPause, FaTachometerAlt } from "react-icons/fa";
+import { IoArrowBack } from "react-icons/io5"; // Import an icon for the back button
 import "./Play.css"; // Import the CSS file
 
 export default function Play() {
   const { videoId } = useParams();
-  // console.log(videoId);
+  const navigate = useNavigate(); // Use navigate for going back
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const webcamRef = useRef<HTMLVideoElement | null>(null);
@@ -214,93 +215,110 @@ export default function Play() {
 
   return (
     <Page>
-      <div className="flex flex-row justify-between space-x-4">
-        {/* Dance/Comparison Video with Pose Detection Overlay */}
-        <div className="videoView relative" style={{ height: "500px" }}>
-          <video
-            id="danceVideo"
-            ref={videoRef}
-            src={videoSrc} // Use dynamic video source
-            className="w-full h-full"
-            loop
-            style={{ objectFit: "cover" }}
-          />
-          <canvas
-            id="video_output_canvas"
-            ref={videoCanvasRef}
-            className="canvas output_canvas"
-            style={{
-              height: "100%",
-              width: "100%",
-              position: "absolute",
-              top: 0,
-              left: 0,
-            }}
-          />
-          {countDown > 0 && (
-            <div className="absolute inset-0 bg-gray-700 bg-opacity-75 flex flex-col items-center justify-center text-white">
-              {countDown}
-            </div>
-          )}
+      {/* Back Button */}
+      <div className="mb-12">
+        <div className="flex items-center">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center text-white"
+          >
+            <IoArrowBack className="mr-2" /> Back
+          </button>
         </div>
 
-        {/* Webcam Video with Pose Detection Overlay */}
-        <div className="videoView" style={{ height: "500px" }}>
-          <video
-            id="webcam"
-            ref={webcamRef}
-            className="w-full h-full"
-            autoPlay
-            playsInline
-            muted
-            style={{ objectFit: "cover" }}
-          />
-          <canvas
-            id="webcam_output_canvas"
-            ref={webcamCanvasRef}
-            className="canvas output_canvas"
-            style={{
-              height: "100%",
-              width: "100%",
-              position: "absolute",
-              top: 0,
-              left: 0,
-            }}
+        {/* Title */}
+        <h1 className="text-white text-center font-bold text-3xl my-6">
+          {videoId?.toUpperCase()}
+        </h1>
+
+        <div className="flex flex-row justify-between space-x-4 my-6">
+          {/* Dance/Comparison Video with Pose Detection Overlay */}
+          <div className="videoView relative" style={{ height: "450px" }}>
+            <video
+              id="danceVideo"
+              ref={videoRef}
+              src={videoSrc} // Use dynamic video source
+              className="w-full h-full"
+              loop
+              style={{ objectFit: "cover" }}
+            />
+            <canvas
+              id="video_output_canvas"
+              ref={videoCanvasRef}
+              className="canvas output_canvas"
+              style={{
+                height: "100%",
+                width: "100%",
+                position: "absolute",
+                top: 0,
+                left: 0,
+              }}
+            />
+            {countDown > 0 && (
+              <div className="absolute inset-0 bg-gray-700 bg-opacity-75 flex flex-col items-center justify-center text-white">
+                {countDown}
+              </div>
+            )}
+          </div>
+
+          {/* Webcam Video with Pose Detection Overlay */}
+          <div className="videoView" style={{ height: "450px" }}>
+            <video
+              id="webcam"
+              ref={webcamRef}
+              className="w-full h-full"
+              autoPlay
+              playsInline
+              muted
+              style={{ objectFit: "cover" }}
+            />
+            <canvas
+              id="webcam_output_canvas"
+              ref={webcamCanvasRef}
+              className="canvas output_canvas"
+              style={{
+                height: "100%",
+                width: "100%",
+                position: "absolute",
+                top: 0,
+                left: 0,
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Controls */}
+        <div className="controls flex justify-between items-center p-2 bg-gray-800 rounded-lg text-white mb-4">
+          <button
+            onClick={handlePlayPause}
+            className="btn p-2 bg-blue-600 rounded-full hover:bg-blue-700 flex items-center"
+          >
+            {isPlaying ? <FaPause /> : <FaPlay />}
+          </button>
+          <div className="speed-controls flex space-x-2">
+            {[0.25, 0.5, 1, 1.5, 2].map((speed) => (
+              <button
+                disabled={isPlaying}
+                key={speed}
+                onClick={() => handleSpeedChange(speed)}
+                className={`btn p-2 rounded-full ${playbackRate === speed ? "bg-green-600" : "bg-gray-600"
+                  } ${!isPlaying && "hover:bg-green-700"} flex items-center`}
+              >
+                <FaTachometerAlt className="mr-1" />
+                {speed}x
+              </button>
+            ))}
+          </div>
+
+          <input
+            type="range"
+            min="0"
+            max={videoRef.current?.duration || 0}
+            value={currentTime}
+            onChange={handleTimelineChange}
+            className="timeline w-full mx-4"
           />
         </div>
-      </div>
-
-      {/* Controls */}
-      <div className="controls flex justify-between items-center p-2 bg-gray-800 rounded-lg text-white">
-        <button
-          onClick={handlePlayPause}
-          className="btn p-2 bg-blue-600 rounded-full hover:bg-blue-700 flex items-center"
-        >
-          {isPlaying ? <FaPause /> : <FaPlay />}
-        </button>
-        <div className="speed-controls flex space-x-2">
-          {[0.25, 0.5, 1, 1.5, 2].map((speed) => (
-            <button
-              disabled={isPlaying}
-              key={speed}
-              onClick={() => handleSpeedChange(speed)}
-              className={`btn p-2 rounded-full ${playbackRate === speed ? "bg-green-600" : "bg-gray-600"
-                } hover:bg-green-700 flex items-center`}
-            >
-              <FaTachometerAlt className="mr-1" />
-              {speed}x
-            </button>
-          ))}
-        </div>
-
-        <input
-          type="range"
-          min="0"
-          max={videoRef.current?.duration || 0}
-          value={currentTime}
-          onChange={handleTimelineChange}
-          className="timeline w-full mx-4"
-        />
       </div>
     </Page>
   );
