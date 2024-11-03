@@ -5,6 +5,8 @@ import { FaAtlas, FaHistory, FaVideo } from "react-icons/fa";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { db, storage } from "../firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import Markdown from "react-markdown";
+import { FaTimes } from "react-icons/fa";
 
 export default function Dashboard() {
 
@@ -243,11 +245,24 @@ function ManageVideos() {
 
 function DanceHistory() {
     const user = useContext(AuthContext);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState("");
+    const [modalContent, setModalContent] = useState("");
+
+    function openModal(content: string) {
+        setModalContent(content);
+        setIsModalOpen(true);
+    }
+
+    function closeModal() {
+        setIsModalOpen(false);
+    }
 
     const [scores, setScore] = useState<any[]>([{
         date: "adahd",
         title: "Floss",
-        score: "1234"
+        score: "1234",
+        notes: "Dancing Prancing",
     }]);
 
     useEffect(() => {
@@ -258,22 +273,39 @@ function DanceHistory() {
             querySnapshot.forEach((doc) => {
                 score_data.push(doc.data());
             });
-            console.log(score_data);
+            // console.log(score_data);
             setScore(score_data);
         }
 
         fetchScores();
-    });
+    }, []);
 
     return (
         <div>
+            {
+                isModalOpen && (
+                    <div>
+                        <div className="absolute inset-0 bg-black opacity-50" onClick={closeModal}></div>
+                        <div className="absolute top-[10%] left-[25%] bg-indigo-900 p-8 font-white flex flex-col w-[800px] h-[500px]">
+                            <div className="flex flex-row">
+                                <h1 className="text-2xl flex-1 font-bold">{modalTitle}</h1>
+                                <FaTimes className="cursor-pointer" onClick={closeModal} />
+                            </div>
+                            <div className="border-white border-2 py-1 my-2"></div>
+                            <Markdown className="w-full overflow-y-auto">
+                                {modalContent}
+                            </Markdown>
+                        </div>
+                    </div>
+                )
+            }
             <h1 className="text-2xl font-bol">Dance History</h1>
             <div className="border-white border-2 py-1 my-2"></div>
             <div className="flex flex-row gap-8 font-bold mb-2">
                 <span className="text-slate-300 w-1/3">Date</span>
                 <span className="w-1/3">Title</span>
                 <span className="w-1/3">Score</span>
-                <span className="pr-10">Replay</span>
+                <span className="pr-10">Notes</span>
             </div>
             <div className="flex flex-col gap-2">
                 {scores.map((item, index) => (
@@ -283,7 +315,10 @@ function DanceHistory() {
                             <span className="break-words w-1/3">{item.title}</span>
                             <span className="break-words w-1/3">{item.score}</span>
                         </div>
-                        <a href={"/play/" + item.title}><button>Play Again</button></a>
+                        <button onClick={() => {
+                            setModalTitle(item.title)
+                            openModal(item.notes)
+                        }}><img src="/map.png" className="w-[25px] mr-16" alt="notes" /></button>
                     </div>
                 ))}
             </div>
