@@ -209,7 +209,7 @@ export default function Play() {
 
         {/* Title */}
         <h1 className="text-white text-center font-bold text-3xl my-6">
-          {videoId?.toUpperCase()} Dance
+          {videoId?.toUpperCase()}
         </h1>
 
         <div className="flex flex-row justify-between space-x-4 my-6">
