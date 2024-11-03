@@ -25,6 +25,8 @@ export default function Play() {
   const [currentTime, setCurrentTime] = useState(0);
   const [countDown, setCountDown] = useState(0);
   const [frames, setFrames] = useState<string[]>([]);
+  const [playAgain, setPlayAgain] = useState(false);
+  const [playModal, setPlayModal] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const aheadVideoRef = useRef<HTMLVideoElement | null>(null); // Off-screen video element
@@ -191,6 +193,25 @@ export default function Play() {
     };
   }, []);
 
+  useEffect(() => {
+    if (playAgain) {
+      setIsPlaying(false);
+      setCountDown(3);
+      setFrames([]);
+      setScore(0);
+      if (videoRef.current && aheadVideoRef.current) {
+        videoRef.current.currentTime = 0;
+        aheadVideoRef.current.currentTime = 2;
+      }
+      setPlayModal(false);
+
+      setTimeout(() => {
+        setPlayAgain(false);
+        handlePlayPause();
+      }, 3000);
+    }
+  }, [playAgain]);
+
   async function openCamera(vectorData: string) {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -237,6 +258,11 @@ export default function Play() {
       videoRef.current.addEventListener("pause", () => {
         aheadVideoRef.current!.pause();
       });
+
+      videoRef.current.addEventListener("ended", () => {
+        setPlayModal(true);
+      });
+
 
       // Set up the ahead video
       aheadVideoRef.current.src = videoRef.current.src;
@@ -380,7 +406,7 @@ export default function Play() {
           </div>
         )}
 
-        <div className="flex flex-row justify-between space-x-4 my-6">
+        <div className="flex flex-row justify-between space-x-4 my-6 relative">
           {/* Dance/Comparison Video with Pose Detection Overlay */}
           <div
             className="videoView relative border-2 border-cyan-500 rounded-lg shadow-subtle"
@@ -438,6 +464,30 @@ export default function Play() {
               }}
             />
           </div>
+          {playModal && (
+            <div className="flex mr-4 flex-col border-2 border-cyan-500 rounded-lg">
+              <div className="absolute inset-0 bg-gray-800 bg-opacity-[90%] flex flex-col items-center justify-center text-white rounded-lg">
+                <h1 className="text-2xl mb-4">Game Over</h1>
+                <div className="flex space-x-4">
+                  <button
+                    onClick={() => setPlayAgain(true)}
+                    className="px-4 py-2 border-4 border-cyan-500 rounded-lg bg-indigo-700 hover:bg-indigo-900 transition-all duration-300"
+                  >
+                    Play Again
+                  </button>
+                  <a href="/explore">
+                    <button
+                      onClick={() => setPlayModal(false)}
+                      className="px-4 py-2 border-4 border-cyan-500 rounded-lg bg-pink-500 hover:bg-pink-700 transition-all duration-300"
+                    >
+                      Another dance
+                    </button>
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
 
         {/* Controls */}
@@ -454,11 +504,9 @@ export default function Play() {
                 disabled={isPlaying}
                 key={speed}
                 onClick={() => handleSpeedChange(speed)}
-                className={`btn p-2 rounded-full ${
-                  playbackRate === speed ? "bg-purple-500" : "bg-gray-700"
-                } ${
-                  !isPlaying && "hover:bg-purple-600"
-                } flex items-center transition-all duration-300`}
+                className={`btn p-2 rounded-full ${playbackRate === speed ? "bg-purple-500" : "bg-gray-700"
+                  } ${!isPlaying && "hover:bg-purple-600"
+                  } flex items-center transition-all duration-300`}
               >
                 <FaTachometerAlt className="mr-1" />
                 {speed}x
