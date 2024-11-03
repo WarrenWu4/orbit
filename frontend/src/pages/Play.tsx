@@ -198,10 +198,9 @@ export default function Play() {
           <video
             id="danceVideo"
             ref={videoRef}
-            src="/rasputin2.mp4" // Source for the dance video
+            src="/videos/dynamite.mov" // Source for the dance video
             className="w-full h-full"
             loop
-            muted
             style={{ objectFit: "cover" }}
           />
           <canvas
@@ -253,7 +252,7 @@ export default function Play() {
           {isPlaying ? <FaPause /> : <FaPlay />}
         </button>
         <div className="speed-controls flex space-x-2">
-          {[0.5, 1, 1.5, 2].map((speed) => (
+          {[0.25, 0.5, 1, 1.5, 2].map((speed) => (
             <button
               key={speed}
               onClick={() => handleSpeedChange(speed)}
@@ -266,6 +265,7 @@ export default function Play() {
             </button>
           ))}
         </div>
+
         <input
           type="range"
           min="0"
