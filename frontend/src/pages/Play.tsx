@@ -11,7 +11,7 @@ import { IoArrowBack } from "react-icons/io5"; // Import an icon for the back bu
 import "./Play.css"; // Import the CSS file
 import calculateScore from "../lib/scoreCalculator";
 import { AuthContext } from "../context/AuthContext";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import toast from "react-hot-toast";
 
@@ -189,7 +189,25 @@ export default function Play() {
     detectFrame();
   }
 
+  // Dynamic video source based on videoId from route params
+  const videoIds = ["ballet", "afro", "footloose", "dynamite", "bhangra", "salsa", "haidilao", "samba", "floss", "butter", "drill", "rasputin"]
+  const [videoSrc, setVideoSrc] = useState((videoId !== undefined && videoIds.includes(videoId)) ? `/videos/${videoId}.mov`: "");
   useEffect(() => {
+    async function getVideoLink() {
+      console.log(videoSrc);
+      if (videoSrc !==  "") {
+        return;
+      }
+      if (videoId !== undefined) {
+        const docRef = doc(db, "videos", videoId!);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setVideoSrc(docSnap.data().videoURL);
+        }
+      }
+    }
+    getVideoLink();
+
     async function getVectorData() {
       const response = await fetch(`/vectors/${videoId}_pose_vectors.txt`);
       const text = await response.text();
@@ -271,8 +289,6 @@ export default function Play() {
     }
   };
 
-  // Dynamic video source based on videoId from route params
-  const videoSrc = `/videos/${videoId}.mov`;
   useEffect(() => {
     if (videoRef.current && aheadVideoRef.current) {
       // Sync the play state
