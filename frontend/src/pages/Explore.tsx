@@ -187,79 +187,87 @@ export default function Explore() {
   return (
     <Page>
       <div className="w-full h-full flex flex-col items-center">
-        <h1 className="text-white font-bold text-3xl">Trending Dances</h1>
-        <span className="mb-8">Play a trending dance</span>
+        <h1 className="text-neon-blue font-extrabold text-4xl neon-highlight">
+          Trending Dances
+        </h1>
+        <span className="mb-8 text-neon-purple font-medium tracking-wider">
+          Play a trending dance
+        </span>
 
         <div className="grid grid-cols-3 gap-y-16 gap-x-16 mx-16">
-          {videos.map((video, index) => (
-            <VideoCard
-              key={index}
-              videoId={video.id}
-              videoUrl={video.videoURL}
-              videoTitle={video.title}
-              hearts={video.hearts}
-              country={video.country}
-            />
-          ))}
+          {videos
+            .sort((a, b) => a.title.localeCompare(b.title)) // Sort videos alphabetically by title
+            .map((video, index) => (
+              <VideoCard
+                key={index}
+                videoId={video.id}
+                videoUrl={video.videoURL}
+                videoTitle={video.title}
+                hearts={video.hearts}
+                country={video.country}
+              />
+            ))}
         </div>
       </div>
     </Page>
   );
-}
 
-function VideoCard(props: any) {
-  const [isHovered, setIsHovered] = useState(false);
-  return (
-    <a href={`/play/${props.videoId}`}>
-      <div
-        className="flex flex-col border-4 border-white px-4 py-2 hover:shadow-arcade hover:cursor-pointer relative gap-1"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <div className="absolute top-[-16px] right-[-16px] border-8 border-white"></div>
-        <div className="flex flex-row items-center gap-2">
-          <img src="/musical-note.png" alt="Music note" className="w-[15px]" />
-          <img
-            className="ml-2 w-[30px] h-[20px]"
-            src={`https://flagcdn.com/w20/${props.country}.png`}
-            alt={`${props.country} flag`}
-          />
-          {/* You can also store local flags if you prefer */}
-          {/* <img src={`/flags/${props.country}.png`} alt="Country flag" className="w-[30px]" /> */}
-          <a
-            href={`/play/${props.videoId}`}
-            className="flex flex-row gap-2 items-center underline text-sm ml-auto"
-          >
-            try it!
-            <div className="w-[25px]">
-              <img src="/joystick.png" alt="play" />
-            </div>
-          </a>
-        </div>
+  function VideoCard(props: any) {
+    const [isHovered, setIsHovered] = useState(false);
+    return (
+      <a href={`/play/${props.videoId}`} className="retro-card-link">
+        <div
+          className="flex flex-col border-4 border-neon-purple rounded-lg px-4 py-2 hover:shadow-retro hover:border-neon-blue hover:bg-gray-800 hover:text-neon-blue transition-all duration-300 relative gap-2"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          <div className="absolute top-[-12px] right-[-12px] border-4 border-neon-purple rounded-full"></div>
+          <div className="flex flex-row items-center gap-2">
+            <img
+              src="/musical-note.png"
+              alt="Music note"
+              className="w-[15px]"
+            />
+            <img
+              className="ml-2 w-[30px] h-[20px]"
+              src={`https://flagcdn.com/w20/${props.country}.png`}
+              alt={`${props.country} flag`}
+            />
+            <a
+              href={`/play/${props.videoId}`}
+              className="flex flex-row gap-2 items-center underline text-sm ml-auto text-neon-blue hover:text-neon-purple"
+            >
+              try it!
+              <div className="w-[25px]">
+                <img src="/joystick.png" alt="play" />
+              </div>
+            </a>
+          </div>
 
-        <div className="video-container relative overflow-x-hidden">
-          <ReactPlayer
-            url={props.videoUrl}
-            playing={isHovered}
-            height="100%"
-            style={{ aspectRatio: "16/9", transform: "translateX(-30%)" }}
-          />
+          <div className="video-container relative overflow-x-hidden border-2 border-neon-blue rounded-md">
+            <ReactPlayer
+              url={props.videoUrl}
+              playing={isHovered}
+              height="100%"
+              style={{ aspectRatio: "16/9", transform: "translateX(-30%)" }}
+            />
 
-          {!isHovered && (
-            <div className="absolute z-2 inset-0 bg-gray-700 bg-opacity-75 flex flex-col items-center justify-center text-white">
-              <img src="/tap.png" alt="" />
-              <span>Hover Me</span>
-            </div>
-          )}
+            {!isHovered && (
+              <div className="absolute z-2 inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-neon-purple">
+                <img src="/tap.png" alt="Tap" className="w-8" />
+                <span className="font-mono">Hover Me</span>
+              </div>
+            )}
+          </div>
+          <div className="text-neon-blue font-bold">{props.videoTitle}</div>
+          <div className="w-full flex flex-row text-neon-purple">
+            <span className="flex items-center">
+              <img src="/heart-icon.png" alt="Heart" className="w-4 h-4 mr-1" />
+              {props.hearts} Hearts
+            </span>
+          </div>
         </div>
-        <div>{props.videoTitle}</div>
-        <div className="w-full flex flex-row">
-          <span>
-            <img src="" alt="" />
-            {props.hearts} Hearts
-          </span>
-        </div>
-      </div>
-    </a>
-  );
+      </a>
+    );
+  }
 }

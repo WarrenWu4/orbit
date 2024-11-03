@@ -17,6 +17,10 @@ body {
   --mdc-theme-on-primary: #f1f3f4;
 }
 
+.shadow-subtle {
+  box-shadow: 0 0 10px #0ff, 0 0 10px #0ff;
+}
+
 video {
   clear: both;
   display: block;

@@ -98,3 +98,35 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.text-neon-blue {
+  color: #00f0ff;
+}
+
+.text-neon-pink {
+  color: #ff00ff;
+}
+
+.border-neon-blue {
+  border-color: #00f0ff;
+}
+
+.border-neon-pink {
+  border-color: #ff00ff;
+}
+
+.hover\:shadow-retro:hover {
+  box-shadow: 0 0 10px #00f0ff, 0 0 15px #ff00ff;
+}
+
+.neon-highlight {
+  text-shadow: 0 0 5px #00f0ff, 0 0 10px #ff00ff;
+}
+
+.bg-gray-100 {
+  background-color: #f5f5f5;
+}
+
+.bg-gray-200 {
+  background-color: #e0e0e0;
+}
