@@ -646,7 +646,7 @@ export default function Play() {
           />
         </div>
         <div>
-          <GeminiContentComponent danceName={videoId + " dance"} />
+          <GeminiContentComponent danceName={videoId}/>
         </div>
       </div>
     </Page>

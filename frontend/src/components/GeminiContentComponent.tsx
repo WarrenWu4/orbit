@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import "../index.css";
+import "../index.css"; // Ensure you have custom styles if needed
+import bananaGif from "../../public/banana.gif"; // Adjust the path as needed
 
 interface GeminiContentComponentProps {
   danceName: string;
@@ -19,7 +20,7 @@ const GeminiContentComponent: React.FC<GeminiContentComponentProps> = ({
 
   const generateContent = async () => {
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY; // Access environment variable in Vite
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
       if (!apiKey) {
         throw new Error("API key is missing.");
       }
@@ -29,7 +30,7 @@ const GeminiContentComponent: React.FC<GeminiContentComponentProps> = ({
         model: "gemini-1.5-flash",
       });
 
-      const prompt = `LIMIT TO ONE TO TWO PARAGRAPHS. Provide detailed information about the cultural and historical significance, origins, and importance of the traditional dance known as '${danceName}', formatted in basic paragraph text without bold formatting.`;
+      const prompt = `LIMIT TO ONE PARAGRAPH. DO NOT ASK FOR MORE CONTEXT AND DONT SAY ANYING ALONG THE LINES OF "DANCE DOES NOT REFER TO A DANCE IN HISTORY" JUST GIVE ME INFO. Provide detailed information about '${danceName}' dance, formatted in basic paragraph text without bold formatting. IF THE DANCE DOESN'T EXIST DONT SAY IT DOESNT EXIST JUST MAKE SOMETHING UP.`;
 
       const result = await model.generateContent(prompt);
 
@@ -42,13 +43,24 @@ const GeminiContentComponent: React.FC<GeminiContentComponentProps> = ({
   };
 
   return (
-    <div className="bg-purple-100 border-2 border-blue-200 p-6 rounded-lg mx-auto my-6 text-center neon-blue-shadow">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">
+    <div className="bg-black border-4 border-neon-blue p-6 rounded-lg mx-auto my-6 text-center relative shadow-neon-blue">
+      <div className="flex justify-between mb-4">
+        <span className="text-neon-pink text-3xl">🕹️</span>
+        <span className="text-neon-green text-3xl">★</span>
+      </div>
+      <h2 className="text-2xl font-bold mb-4 text-neon-blue uppercase tracking-wider">
         Information About: {danceName}
       </h2>
-      <p className="whitespace-pre-wrap text-gray-800 text-lg leading-relaxed">
-        {responseText}
-      </p>
+      <div className="flex items-center justify-between">
+        <p className="text-left whitespace-pre-wrap text-white text-lg leading-relaxed flex-1 mr-4">
+          {responseText}
+        </p>
+        <img src={bananaGif} alt="Banana GIF" className="w-1/4 h-auto" />
+      </div>
+      <div className="flex justify-between mt-4">
+        <span className="text-neon-yellow text-3xl">🎵</span>
+        <span className="text-neon-purple text-3xl">💎</span>
+      </div>
     </div>
   );
 };

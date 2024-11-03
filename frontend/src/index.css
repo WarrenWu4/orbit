@@ -157,15 +157,41 @@ body::before {
 }
 
 .text-neon-blue {
-  color: #00f0ff;
+  color: #00f6ff;
+  text-shadow: 0 0 1px #00f6ff, 0 0 1px #00f6ff, 0 0 1px #00f6ff;
 }
 
 .text-neon-pink {
   color: #ff00ff;
 }
 
-.neon-blue-shadow {
-  box-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 10px #0ff, 0 0 10px #0ff;
+.text-neon-blue {
+  color: #00f6ff;
+  text-shadow: 0 0 5px #00f6ff, 0 0 10px #00f6ff, 0 0 15px #00f6ff;
+}
+
+.text-neon-pink {
+  color: #ff00ff;
+  text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff, 0 0 15px #ff00ff;
+}
+
+.text-neon-green {
+  color: #39ff14;
+  text-shadow: 0 0 5px #39ff14, 0 0 10px #39ff14, 0 0 15px #39ff14;
+}
+
+.text-neon-yellow {
+  color: #ffff00;
+  text-shadow: 0 0 5px #ffff00, 0 0 10px #ffff00, 0 0 15px #ffff00;
+}
+
+.text-neon-purple {
+  color: #9400d3;
+  text-shadow: 0 0 5px #9400d3, 0 0 10px #9400d3, 0 0 15px #9400d3;
+}
+
+.shadow-neon-blue {
+  box-shadow: 0 0 10px #00f6ff, 0 0 20px #00f6ff, 0 0 30px #00f6ff;
 }
 
 .border-neon-blue {

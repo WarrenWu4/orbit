@@ -1,10 +1,10 @@
 import { useContext, useEffect, useRef, useState } from "react"
 import { AuthContext } from "../context/AuthContext"
 import Page from "../layouts/Page";
-import { FaAtlas, FaHistory, FaVideo } from "react-icons/fa";
+import { FaAtlas, FaHistory, FaRegTrashAlt, FaVideo } from "react-icons/fa";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { db, storage } from "../firebase";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, query, where } from "firebase/firestore";
 import Markdown from "react-markdown";
 import { FaTimes } from "react-icons/fa";
 
@@ -29,6 +29,7 @@ export default function Dashboard() {
                     <div className="w-full h-full flex gap-4">
                         <Sidebar
                             username={user.displayName!}
+                            userPhoto={user.photoURL!}
                             setContent={setContent}
                         />
                         <div className="w-full h-full border-4 p-4 border-white">
@@ -44,10 +45,11 @@ export default function Dashboard() {
 
 interface SidebarProps {
     username: string;
+    userPhoto: string;
     setContent: React.Dispatch<React.SetStateAction<JSX.Element>>;
 }
 
-function Sidebar({ username, setContent }: SidebarProps) {
+function Sidebar({ username, userPhoto, setContent }: SidebarProps) {
 
     const sections = [
         { icon: <FaVideo />, title: "Upload Video", content: <MainContent /> },
@@ -56,7 +58,7 @@ function Sidebar({ username, setContent }: SidebarProps) {
     ]
 
     return (
-        <div className="max-w-[300px] w-full h-full border-4 border-white p-4 flex flex-col gap-y-8 font-orbit font-bold">
+        <div className="max-w-[240px] w-full h-full border-4 border-white p-4 flex flex-col gap-y-8 font-orbit font-bold">
 
             {sections.map((section, index) => {
                 return (
@@ -67,7 +69,8 @@ function Sidebar({ username, setContent }: SidebarProps) {
                 )
             })}
 
-            <div className="mt-auto">
+            <div className="mt-auto flex items-center gap-x-2 text-xl">
+                <img src={userPhoto} className="w-6 h-6"/>
                 <h4>{username}</h4>
             </div>
 
@@ -172,7 +175,7 @@ function MainContent() {
                     <label>
                         Video File
                     </label>
-                    <input type="file" id="supercoolvideo" className="border-2 border-black rounded-md p-2" />
+                    <input type="file" id="supercoolvideo" className="p-2" />
                 </div>
 
                 <div className="flex flex-col gap-y-1">
@@ -228,13 +231,22 @@ function ManageVideos() {
 
             <div className="border-white border-2 py-1 my-2"></div>
 
+            <div className="w-full flex flex-row gap-8 font-bold mb-2">
+                <span className="">Video Name</span>
+                <span className="ml-auto">Delete</span>
+            </div>
+
             {videos.map((video) => {
+                async function deleteVideo() {
+                    await deleteDoc(doc(db, "videos", video.docRefId));
+                }
+
                 return (
                     <div key={video.docRefId} className="w-full p-4 flex justify-between">
                         <h1>{video.title}</h1>
-                        <div>
-                            <button></button>
-                        </div>
+                        <button className="text-xl" type="button" onClick={deleteVideo}>
+                            <FaRegTrashAlt />
+                        </button>
                     </div>
                 )
             })}
