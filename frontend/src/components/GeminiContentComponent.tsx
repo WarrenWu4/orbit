@@ -30,7 +30,7 @@ const GeminiContentComponent: React.FC<GeminiContentComponentProps> = ({
         model: "gemini-1.5-flash",
       });
 
-      const prompt = `LIMIT TO ONE PARAGRAPHS. DO NOT ASK FOR MORE CONTEXT AND DONT SAY ANYING ALONG THE LINES OF "DANCE DOES NOT REFER TO A DANCE IN HISTORY" JUST GIVE ME INFO. Provide detailed information about '${danceName}' dance, formatted in basic paragraph text without bold formatting.`;
+      const prompt = `LIMIT TO ONE PARAGRAPH. DO NOT ASK FOR MORE CONTEXT AND DONT SAY ANYING ALONG THE LINES OF "DANCE DOES NOT REFER TO A DANCE IN HISTORY" JUST GIVE ME INFO. Provide detailed information about '${danceName}' dance, formatted in basic paragraph text without bold formatting. IF THE DANCE DOESN'T EXIST DONT SAY IT DOESNT EXIST JUST MAKE SOMETHING UP.`;
 
       const result = await model.generateContent(prompt);
 
