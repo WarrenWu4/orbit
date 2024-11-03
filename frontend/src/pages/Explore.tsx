@@ -230,7 +230,7 @@ export default function Explore() {
             />
             <img
               className="ml-2 w-[30px] h-[20px]"
-              src={`https://flagcdn.com/w20/${props.country}.png`}
+              src={`https://flagcdn.com/w160/${props.country}.png`}
               alt={`${props.country} flag`}
             />
             <a
