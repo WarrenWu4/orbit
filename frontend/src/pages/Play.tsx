@@ -122,7 +122,7 @@ export default function Play() {
             if (videoRef) {
               if (videoRef.current!.currentTime > 0 && videoRef.current!.paused === false && videoRef.current?.ended === false) {
                 const score = calculateScore(vectorData, result.landmarks, videoRef.current!.currentTime);
-                if ((videoRef.current!.currentTime % 2) <= 0.1) {
+                if ((videoRef.current!.currentTime % 5) <= 0.1) {
                   setScore(Math.round(score));
                 }
               }
@@ -282,7 +282,7 @@ export default function Play() {
               }}
             />
             {countDown > 0 && (
-              <div className="absolute inset-0 bg-gray-700 bg-opacity-75 flex flex-col items-center justify-center text-white">
+              <div className="absolute inset-0 text-4xl bg-gray-700 bg-opacity-75 flex flex-col items-center justify-center text-white">
                 {countDown}
               </div>
             )}
