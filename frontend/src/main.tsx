@@ -9,37 +9,41 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import { AuthProvider } from './providers/AuthProvider';
 import Play from './pages/Play';
+import { Toaster } from 'react-hot-toast';
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <Landing/>,
+        element: <Landing />,
     },
     {
         path: "/explore",
-        element: <Explore/>
+        element: <Explore />
     },
     {
         path: "/signup",
-        element: <Signup/>
+        element: <Signup />
     },
     {
         path: "/login",
-        element: <Login/>
+        element: <Login />
     },
     {
         path: "/dashboard",
-        element: <Dashboard/>
+        element: <Dashboard />
     },
     {
         path: "/play/:videoId",
-        element: <Play/>
+        element: <Play />
     }
 ]);
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <AuthProvider>
+            <Toaster
+                position='top-center'
+                reverseOrder={false} />
             <RouterProvider router={router} />
         </AuthProvider>
     </StrictMode>,
