@@ -116,6 +116,8 @@ export default function Play() {
 
     const canvasCtx = webcamCanvasRef.current.getContext("2d");
 
+    let lastScoreUpdateTime = 0;
+
     function detectFrame() {
       if (!poseLandmarker || !webcamRef.current) return;
       poseLandmarker.detectForVideo(
@@ -131,17 +133,18 @@ export default function Play() {
                 videoRef.current!.paused === false &&
                 videoRef.current?.ended === false
               ) {
-                if (videoRef.current!.currentTime < 0.1) {
-                  console.log(result.landmarks);
+
+                // every 5 seconds, update the score
+                if (Math.floor(videoRef.current!.currentTime / 5) !== Math.floor(lastScoreUpdateTime / 5)) {
+                  const score = calculateScore(
+                    vectorData,
+                    result.landmarks,
+                    videoRef.current!.currentTime
+                  );
+                  setScore((prev) => Math.round(score)+prev);
+                  lastScoreUpdateTime = videoRef.current!.currentTime;
                 }
-                const score = calculateScore(
-                  vectorData,
-                  result.landmarks,
-                  videoRef.current!.currentTime
-                );
-                if (videoRef.current!.currentTime % 5 <= 0.1) {
-                  setScore((prev) => Math.round(score) + prev);
-                }
+
               }
             }
 
@@ -334,13 +337,13 @@ export default function Play() {
     if (aheadVideoRef.current) {
       const captureFrameAhead = () => {
         const canvas = document.createElement("canvas");
-        canvas.width = aheadVideoRef.current.videoWidth;
-        canvas.height = aheadVideoRef.current.videoHeight;
+        canvas.width = aheadVideoRef.current!.videoWidth;
+        canvas.height = aheadVideoRef.current!.videoHeight;
         const ctx = canvas.getContext("2d");
 
         if (ctx) {
           ctx.drawImage(
-            aheadVideoRef.current,
+            aheadVideoRef.current!,
             0,
             0,
             canvas.width,
