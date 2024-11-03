@@ -145,6 +145,6 @@ export default function calculateScore(vectorData: string, currentData: any[], c
 
     const s = score(data);
 
-    return s;
+    return {scoreData: s, angleData: data};
 }
 

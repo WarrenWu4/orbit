@@ -10,8 +10,9 @@ import { FaPlay, FaPause, FaTachometerAlt } from "react-icons/fa";
 import { IoArrowBack } from "react-icons/io5"; // Import an icon for the back button
 import "./Play.css"; // Import the CSS file
 import calculateScore from "../lib/scoreCalculator";
+import GeminiContentComponent from "../components/GeminiContentComponent";
 import { AuthContext } from "../context/AuthContext";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import toast from "react-hot-toast";
 
@@ -20,6 +21,7 @@ export default function Play() {
   const navigate = useNavigate(); // Use navigate for going back
 
   const [score, setScore] = useState(0);
+  let angleData: number[][] = [];
   const user = useContext(AuthContext);
 
   const webcamRef = useRef<HTMLVideoElement | null>(null);
@@ -155,18 +157,17 @@ export default function Play() {
                 videoRef.current!.paused === false &&
                 videoRef.current?.ended === false
               ) {
-
                 // every 5 seconds, update the score
                 if (Math.floor(videoRef.current!.currentTime / 5) !== Math.floor(lastScoreUpdateTime / 5)) {
-                  const score = calculateScore(
+                  const calcData = calculateScore(
                     vectorData,
                     result.landmarks,
                     videoRef.current!.currentTime
                   );
-                  setScore((prev) => Math.round(score)+prev);
+                  setScore((prev) => Math.round(calcData.scoreData)+prev);
+                  angleData = [...angleData, calcData.angleData];
                   lastScoreUpdateTime = videoRef.current!.currentTime;
                 }
-
               }
             }
 
@@ -187,7 +188,25 @@ export default function Play() {
     detectFrame();
   }
 
+  // Dynamic video source based on videoId from route params
+  const videoIds = ["ballet", "afro", "footloose", "dynamite", "bhangra", "salsa", "haidilao", "samba", "floss", "butter", "drill", "rasputin"]
+  const [videoSrc, setVideoSrc] = useState((videoId !== undefined && videoIds.includes(videoId)) ? `/videos/${videoId}.mov`: "");
   useEffect(() => {
+    async function getVideoLink() {
+      console.log(videoSrc);
+      if (videoSrc !==  "") {
+        return;
+      }
+      if (videoId !== undefined) {
+        const docRef = doc(db, "videos", videoId!);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setVideoSrc(docSnap.data().videoURL);
+        }
+      }
+    }
+    getVideoLink();
+
     async function getVectorData() {
       const response = await fetch(`/vectors/${videoId}_pose_vectors.txt`);
       const text = await response.text();
@@ -269,8 +288,6 @@ export default function Play() {
     }
   };
 
-  // Dynamic video source based on videoId from route params
-  const videoSrc = `/videos/${videoId}.mov`;
   useEffect(() => {
     if (videoRef.current && aheadVideoRef.current) {
       // Sync the play state
@@ -283,6 +300,7 @@ export default function Play() {
       });
 
       videoRef.current.addEventListener("ended", () => {
+        console.log(angleData);
         setPlayModal(true);
       });
 
@@ -610,6 +628,9 @@ export default function Play() {
             onChange={handleTimelineChange}
             className="timeline w-full mx-4 bg-transparent accent-purple-500 rounded-lg"
           />
+        </div>
+        <div>
+          <GeminiContentComponent danceName={videoId + " dance"}/>
         </div>
       </div>
     </Page>

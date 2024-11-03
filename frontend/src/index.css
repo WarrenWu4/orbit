@@ -88,7 +88,7 @@ button {
 
 .bg-gradient-1::before {
   position: absolute;
-  content: '';
+  content: "";
   top: 0;
   right: 0;
   bottom: 0;
@@ -130,12 +130,42 @@ body::before {
   z-index: -1; /* Ensure the background stays behind the content */
 }
 
+.retro-container {
+  background-color: #fef3c7; /* Light yellow, retro paper color */
+  border: 2px solid #f59e0b; /* Orange border */
+  padding: 20px;
+  border-radius: 8px;
+  font-family: "Courier New", Courier, monospace; /* Retro typewriter font */
+  color: #2d3748; /* Dark gray text color */
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  max-width: 800px;
+  margin: auto;
+}
+
+.retro-title {
+  font-family: "Press Start 2P", cursive; /* Retro video game font */
+  font-size: 24px;
+  color: #d97706; /* Dark orange for a vintage look */
+  text-align: center;
+}
+
+.retro-text {
+  white-space: pre-wrap; /* Preserve line breaks */
+  line-height: 1.6;
+  font-size: 16px;
+  margin-top: 15px;
+}
+
 .text-neon-blue {
   color: #00f0ff;
 }
 
 .text-neon-pink {
   color: #ff00ff;
+}
+
+.neon-blue-shadow {
+  box-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 10px #0ff, 0 0 10px #0ff;
 }
 
 .border-neon-blue {
