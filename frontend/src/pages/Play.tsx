@@ -155,7 +155,7 @@ export default function Play() {
 
   useEffect(() => {
     async function getVectorData() {
-      const response = await fetch("/rasputin_pose_vectors.txt");
+      const response = await fetch(`/vectors/${videoId}_pose_vectors.txt`);
       const text = await response.text();
       loadPoseLandmarker().then(() => {
         if (videoRef.current) {
