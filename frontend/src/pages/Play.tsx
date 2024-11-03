@@ -212,12 +212,12 @@ export default function Play() {
     }
   }
 
-  const handleSpeedChange = (speed: number) => {
-    if (videoRef.current) {
-      videoRef.current.playbackRate = speed;
-      setPlaybackRate(speed);
-    }
-  };
+  //   const handleSpeedChange = (speed: number) => {
+  //     if (videoRef.current) {
+  //       videoRef.current.playbackRate = speed;
+  //       setPlaybackRate(speed);
+  //     }
+  //   };
 
   const handleTimelineChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (videoRef.current) {
@@ -287,11 +287,21 @@ export default function Play() {
         }
       };
 
-      const interval = setInterval(captureFrameAhead, 200); // Capture frame every second
+      // Set interval based on playback rate
+      const intervalDuration = 1000 / playbackRate; // Adjust interval inversely proportional to playback rate
+      const interval = setInterval(captureFrameAhead, intervalDuration);
 
       return () => clearInterval(interval);
     }
-  }, [videoSrc]);
+  }, [videoSrc, playbackRate]); // Dependency includes playbackRate to adjust the interval when it changes
+
+  const handleSpeedChange = (speed: number) => {
+    if (videoRef.current && aheadVideoRef.current) {
+      videoRef.current.playbackRate = speed;
+      aheadVideoRef.current.playbackRate = speed; // Apply speed to ahead video as well
+      setPlaybackRate(speed); // Update state to trigger re-render and interval adjustment
+    }
+  };
 
   useEffect(() => {
     if (carouselRef.current) {
