@@ -191,7 +191,7 @@ export default function Explore() {
           Trending Dances
         </h1>
         <span className="mb-8 text-neon-purple font-medium tracking-wider">
-          Play a trending dance
+          Learn new dances from across the world
         </span>
 
         <div className="grid grid-cols-3 gap-y-16 gap-x-16 mx-16">

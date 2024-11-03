@@ -17,7 +17,6 @@ export default function Play() {
 
   const [score, setScore] = useState(0);
 
-  const videoRef = useRef<HTMLVideoElement | null>(null);
   const webcamRef = useRef<HTMLVideoElement | null>(null);
   const videoCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const webcamCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -25,6 +24,11 @@ export default function Play() {
   const [playbackRate, setPlaybackRate] = useState(1);
   const [currentTime, setCurrentTime] = useState(0);
   const [countDown, setCountDown] = useState(0);
+  const [frames, setFrames] = useState<string[]>([]);
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const aheadVideoRef = useRef<HTMLVideoElement | null>(null); // Off-screen video element
+  const carouselRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (isPlaying) {
@@ -208,20 +212,6 @@ export default function Play() {
     }
   }
 
-  const handlePlayPause = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        setTimeout(() => {
-          videoRef.current?.play();
-        }, 3000);
-        // videoRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
-
   const handleSpeedChange = (speed: number) => {
     if (videoRef.current) {
       videoRef.current.playbackRate = speed;
@@ -237,6 +227,94 @@ export default function Play() {
 
   // Dynamic video source based on videoId from route params
   const videoSrc = `/videos/${videoId}.mov`;
+  useEffect(() => {
+    if (videoRef.current && aheadVideoRef.current) {
+      // Sync the play state
+      videoRef.current.addEventListener("play", () => {
+        aheadVideoRef.current!.play();
+      });
+
+      videoRef.current.addEventListener("pause", () => {
+        aheadVideoRef.current!.pause();
+      });
+
+      // Set up the ahead video
+      aheadVideoRef.current.src = videoRef.current.src;
+      aheadVideoRef.current.currentTime = videoRef.current.currentTime + 2; // 1 second ahead
+      aheadVideoRef.current.muted = true; // Mute the off-screen video
+    }
+
+    return () => {
+      if (videoRef.current && aheadVideoRef.current) {
+        videoRef.current.removeEventListener("play", () => {
+          aheadVideoRef.current!.play();
+        });
+        videoRef.current.removeEventListener("pause", () => {
+          aheadVideoRef.current!.pause();
+        });
+      }
+    };
+  }, [videoSrc]);
+
+  // Frame capturing logic
+  useEffect(() => {
+    if (aheadVideoRef.current) {
+      const captureFrameAhead = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = aheadVideoRef.current.videoWidth;
+        canvas.height = aheadVideoRef.current.videoHeight;
+        const ctx = canvas.getContext("2d");
+
+        if (ctx) {
+          ctx.drawImage(
+            aheadVideoRef.current,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+          );
+          const frame = canvas.toDataURL("image/jpeg");
+
+          setFrames((prevFrames) => {
+            if (
+              prevFrames.length === 0 ||
+              prevFrames[prevFrames.length - 1] !== frame
+            ) {
+              return [...prevFrames, frame];
+            }
+            return prevFrames;
+          });
+        }
+      };
+
+      const interval = setInterval(captureFrameAhead, 200); // Capture frame every second
+
+      return () => clearInterval(interval);
+    }
+  }, [videoSrc]);
+
+  useEffect(() => {
+    if (carouselRef.current) {
+      carouselRef.current.scrollLeft = carouselRef.current.scrollWidth;
+    }
+  }, [frames]);
+
+  const handlePlayPause = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+        aheadVideoRef.current?.pause();
+      } else {
+        setTimeout(() => {
+          videoRef.current?.play();
+          aheadVideoRef.current?.play();
+        }, 3000);
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const displayedFrames = frames.slice(-5);
 
   return (
     <Page>
@@ -265,11 +343,38 @@ export default function Play() {
           </h1>
         </div>
 
+        <video ref={aheadVideoRef} style={{ display: "none" }} />
+
+        {/* Main video and carousel */}
+        {/* Existing video, controls, and carousel implementation */}
+        {displayedFrames.length > 0 && (
+          <div
+            ref={carouselRef}
+            className="carousel-container gap-2 mt-4 flex justify-between p-2"
+          >
+            {displayedFrames.map((frame, index) => (
+              <div key={index} className="carousel-item w-1/6">
+                <img
+                  src={frame}
+                  alt={`Frame ${index + 1}`}
+                  className="w-full h-32 object-cover rounded-lg"
+                  style={{
+                    transform: "scaleX(-1)",
+                    border: "1px solid #00ffff", // Neon blue border
+                    boxShadow:
+                      "0 0 10px #00ffff, 0 0 10px #00ffff, 0 0 10px #00ffff", // Neon glow effect
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className="flex flex-row justify-between space-x-4 my-6">
           {/* Dance/Comparison Video with Pose Detection Overlay */}
           <div
             className="videoView relative border-2 border-cyan-500 rounded-lg shadow-subtle"
-            style={{ height: "510px" }}
+            style={{ height: "450px" }}
           >
             <video
               id="danceVideo"
@@ -300,7 +405,7 @@ export default function Play() {
           {/* Webcam Video with Pose Detection Overlay */}
           <div
             className="videoView relative border-2 border-pink-500 rounded-lg shadow-subtle"
-            style={{ height: "510px" }}
+            style={{ height: "450px" }}
           >
             <video
               id="webcam"

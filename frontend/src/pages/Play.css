@@ -21,6 +21,15 @@ body {
   box-shadow: 0 0 10px #0ff, 0 0 10px #0ff;
 }
 
+.carousel-container {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.carousel-item {
+  flex-shrink: 0;
+}
+
 video {
   clear: both;
   display: block;
