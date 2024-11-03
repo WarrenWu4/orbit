@@ -4,7 +4,7 @@ import Page from "../layouts/Page";
 import { FaAtlas, FaHistory, FaVideo } from "react-icons/fa";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { db, storage } from "../firebase";
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
 export default function Dashboard() {
 
@@ -77,9 +77,13 @@ function MainContent() {
 
     const user = useContext(AuthContext);
     const videoTitle = useRef<HTMLInputElement>(null);
+    const countryRef = useRef<HTMLSelectElement>(null);
+    const [countryNames, setCountryNames] = useState<string[]>([]);
+    const [countries, setCountries] = useState<{[name:string]: string}>({});
 
     function handleVideoUpload(e: React.FormEvent) {
         e.preventDefault();
+        const countryVal = countryRef.current?.value;
         const fileInput = document.getElementById("supercoolvideo") as HTMLInputElement;
         if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
             alert("Please select a file first.");
@@ -113,6 +117,7 @@ function MainContent() {
                 body: JSON.stringify({ 
                     user: user!.uid,
                     title: (videoTitle.current) ? videoTitle.current.value : "o shit",
+                    country: countries[countryVal!], 
                     videoURL: downloadURL,
                     hearts: 0,
                     vectorData: []
@@ -122,6 +127,27 @@ function MainContent() {
           );
         console.log("Video uploaded");
     }
+
+    useEffect(() => {
+
+        async function fetchCountries() {
+            const response = await fetch("/countries.txt")
+            const data = await response.text()
+            const [names, codes] = data.split("\n").map(line => {
+                return line.trim().split("|")
+            })
+
+            setCountryNames(names);
+            const temp:{[name:string]:string} = {}
+            names.forEach((name, idx) => {
+                temp[name] = codes[idx];
+            })
+            setCountries(temp);
+        }
+
+        fetchCountries();
+
+    }, [])
 
     return (
         <div>
@@ -143,6 +169,17 @@ function MainContent() {
                         Video File
                     </label>
                     <input type="file" id="supercoolvideo" className="border-2 border-black rounded-md p-2" />
+                </div>
+
+                <div className="flex flex-col gap-y-1">
+                    <label>Country of Origin</label>
+                    <select ref={countryRef} className="border-2 border-black rounded-md p-2 text-black">
+                        {countryNames.map((name, index) => {
+                            return (
+                                <option key={index}>{name}</option>
+                            )
+                        })}
+                    </select>
                 </div>
 
                 <button type="submit" className="bg-black text-white py-2 rounded-md">

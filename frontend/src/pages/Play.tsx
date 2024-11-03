@@ -131,6 +131,9 @@ export default function Play() {
                 videoRef.current!.paused === false &&
                 videoRef.current?.ended === false
               ) {
+                if (videoRef.current!.currentTime < 0.1) {
+                  console.log(result.landmarks);
+                }
                 const score = calculateScore(
                   vectorData,
                   result.landmarks,
