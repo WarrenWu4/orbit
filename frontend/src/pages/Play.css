@@ -17,6 +17,10 @@ body {
   --mdc-theme-on-primary: #f1f3f4;
 }
 
+input[type="range"] {
+  accent-color: #a855f7; /* Custom purple color */
+}
+
 .shadow-subtle {
   box-shadow: 0 0 10px #0ff, 0 0 10px #0ff;
 }

@@ -465,14 +465,13 @@ export default function Play() {
               </button>
             ))}
           </div>
-
           <input
             type="range"
             min="0"
             max={videoRef.current?.duration || 0}
             value={currentTime}
             onChange={handleTimelineChange}
-            className="timeline w-full mx-4 bg-transparent accent-pink-500 rounded-lg"
+            className="timeline w-full mx-4 bg-transparent accent-purple-500 rounded-lg"
           />
         </div>
       </div>
