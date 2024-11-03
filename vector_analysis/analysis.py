@@ -1,3 +1,4 @@
+import math
 import numpy as np
 
 def get_vertices(filename):
@@ -61,6 +62,21 @@ for i in range(iterations):
     for j in range(12):
         angles.append(angle_between(vid1[i][j], vid2[i][j]))
     data.append(angles)
+
+MAX_SCORE = 1000
+
+def score(data):
+    angle_btw = np.array(data)
+    normalize_angle = angle_btw / math.pi
+    weights = np.array([0.125, 0.10, 0.05, 0.10, 0.125, 0.05, 0.05, 0.05, 0.05, 0.05, 0.125, 0.125]) * MAX_SCORE
+    weighted_sum = np.sum(normalize_angle * weights)
+    
+    # print(angle_btw * 180.0 / math.pi)
+    # print(normalize_angle)
+    # print(normalize_angle * weights)
+    # print(weighted_sum)
+    
+    return MAX_SCORE - weighted_sum
 
 
         
