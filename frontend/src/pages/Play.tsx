@@ -140,7 +140,7 @@ export default function Play() {
                   videoRef.current!.currentTime
                 );
                 if (videoRef.current!.currentTime % 5 <= 0.1) {
-                  setScore((prev) => Math.round(score)+prev);
+                  setScore((prev) => Math.round(score) + prev);
                 }
               }
             }
@@ -236,13 +236,6 @@ export default function Play() {
     }
   }
 
-  //   const handleSpeedChange = (speed: number) => {
-  //     if (videoRef.current) {
-  //       videoRef.current.playbackRate = speed;
-  //       setPlaybackRate(speed);
-  //     }
-  //   };
-
   const handleTimelineChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (videoRef.current) {
       videoRef.current.currentTime = Number(event.target.value);
@@ -266,7 +259,6 @@ export default function Play() {
         setPlayModal(true);
       });
 
-
       // Set up the ahead video
       aheadVideoRef.current.src = videoRef.current.src;
       aheadVideoRef.current.currentTime = videoRef.current.currentTime + 2; // 1 second ahead
@@ -281,6 +273,58 @@ export default function Play() {
         videoRef.current.removeEventListener("pause", () => {
           aheadVideoRef.current!.pause();
         });
+      }
+    };
+  }, [videoSrc]);
+
+  useEffect(() => {
+    async function captureInitialFrames() {
+      if (aheadVideoRef.current) {
+        const canvas = document.createElement("canvas");
+        canvas.width = aheadVideoRef.current.videoWidth;
+        canvas.height = aheadVideoRef.current.videoHeight;
+        const ctx = canvas.getContext("2d");
+
+        for (let i = 0; i < 5; i++) {
+          aheadVideoRef.current.currentTime = i + 1; // Move to the next second ahead
+          await new Promise((resolve) => {
+            aheadVideoRef.current!.onseeked = () => {
+              if (ctx) {
+                ctx.drawImage(
+                  aheadVideoRef.current!,
+                  0,
+                  0,
+                  canvas.width,
+                  canvas.height
+                );
+                const frame = canvas.toDataURL("image/jpeg");
+                setFrames((prevFrames) => {
+                  if (!prevFrames.includes(frame)) {
+                    return [...prevFrames, frame];
+                  }
+                  return prevFrames;
+                });
+              }
+              resolve(true);
+            };
+          });
+        }
+      }
+    }
+
+    if (aheadVideoRef.current) {
+      aheadVideoRef.current.addEventListener(
+        "loadedmetadata",
+        captureInitialFrames
+      );
+    }
+
+    return () => {
+      if (aheadVideoRef.current) {
+        aheadVideoRef.current.removeEventListener(
+          "loadedmetadata",
+          captureInitialFrames
+        );
       }
     };
   }, [videoSrc]);
@@ -490,7 +534,6 @@ export default function Play() {
               </div>
             </div>
           )}
-
         </div>
 
         {/* Controls */}
@@ -507,9 +550,11 @@ export default function Play() {
                 disabled={isPlaying}
                 key={speed}
                 onClick={() => handleSpeedChange(speed)}
-                className={`btn p-2 rounded-full ${playbackRate === speed ? "bg-purple-500" : "bg-gray-700"
-                  } ${!isPlaying && "hover:bg-purple-600"
-                  } flex items-center transition-all duration-300`}
+                className={`btn p-2 rounded-full ${
+                  playbackRate === speed ? "bg-purple-500" : "bg-gray-700"
+                } ${
+                  !isPlaying && "hover:bg-purple-600"
+                } flex items-center transition-all duration-300`}
               >
                 <FaTachometerAlt className="mr-1" />
                 {speed}x
