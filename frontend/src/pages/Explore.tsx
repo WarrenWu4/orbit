@@ -3,8 +3,10 @@ import Page from "../layouts/Page";
 import ReactPlayer from "react-player";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
+import { HiCursorClick } from "react-icons/hi";
 
 export default function Explore() {
+
   const [videos, setVideos] = useState([
     {
       id: "ballet",
@@ -125,11 +127,13 @@ export default function Explore() {
             .map((video, index) => (
               <VideoCard
                 key={index}
+                order={index}
                 videoId={video.id}
                 videoUrl={video.videoURL}
                 videoTitle={video.title}
                 hearts={video.hearts}
                 country={video.country}
+                setVideos={setVideos}
               />
             ))}
         </div>
@@ -142,11 +146,11 @@ export default function Explore() {
     return (
       <a href={`/play/${props.videoId}`} className="retro-card-link">
         <div
-          className="flex flex-col border-4 border-neon-purple rounded-lg px-4 py-2 hover:shadow-retro hover:border-neon-blue hover:bg-gray-800 hover:text-neon-blue transition-all duration-300 relative gap-2"
+          className="flex flex-col border-4 border-neon-purple px-4 py-2 hover:shadow-retro hover:border-neon-blue hover:bg-gray-800 hover:text-neon-blue transition-all duration-300 relative gap-2"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          <div className="absolute top-[-12px] right-[-12px] border-4 border-neon-purple rounded-full"></div>
+          <div className="absolute top-[-12px] right-[-12px] border-4 border-neon-blue"></div>
           <div className="flex flex-row items-center gap-2">
             <img
               src="/musical-note.png"
@@ -169,7 +173,7 @@ export default function Explore() {
             </a>
           </div>
 
-          <div className="video-container relative overflow-x-hidden border-2 border-neon-blue rounded-md">
+          <div className="video-container relative overflow-x-hidden border-2 border-neon-blue">
             <ReactPlayer
               url={props.videoUrl}
               playing={isHovered}
@@ -179,17 +183,21 @@ export default function Explore() {
 
             {!isHovered && (
               <div className="absolute z-2 inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-neon-purple">
-                <img src="/tap.png" alt="Tap" className="w-8" />
-                <span>Hover Me</span>
+                <div className="w-fit h-fit relative -translate-x-1">
+                  <HiCursorClick className="text-3xl text-white" />
+                  <span className="absolute top-0 left-0 inline-flex rounded-full h-fit w-fit bg-white"></span>
+                  <span className="top-0 left-0 animate-ping absolute inline-flex h-4 w-4 rounded-full bg-white opacity-75"></span>
+                </div>
+                <span className="mt-2 text-white">Hover Me</span>
               </div>
             )}
           </div>
-          <div className="text-neon-blue font-bold">{props.videoTitle}</div>
-          <div className="w-full flex flex-row text-neon-purple">
-            <span className="flex items-center">
-              <img src="/heart-icon.png" alt="Heart" className="w-4 h-4 mr-1" />
-              {props.hearts} Hearts
-            </span>
+          <div className="w-full flex items-center justify-between">
+            <div className="text-neon-blue font-bold">{props.videoTitle}</div>
+            <div className="flex flex-row text-neon-purple items-center gap-x-2">
+                {props.hearts}
+                <img src="/heart-icon.png" alt="Heart" className="w-4 h-4 mr-1" />
+            </div>
           </div>
         </div>
       </a>
