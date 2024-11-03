@@ -2,10 +2,14 @@ import { useContext } from "react"
 import { AuthContext } from "../context/AuthContext"
 import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
+import { useLocation } from "react-router-dom";
 
 export default function Navbar() {
 
     const user = useContext(AuthContext)
+    const currLocation = useLocation().pathname
+
+    const active = "underline underline-offset-4 decoration-4"
 
     async function handleLogOut() {
         try {
@@ -24,9 +28,9 @@ export default function Navbar() {
             </a>
             
             <div className="flex gap-x-4 items-center font-bold">
-                <a href="/">Home</a>
-                <a href="/dashboard">Dashboard</a>
-                <a href="/explore">Explore</a>
+                <a className={(currLocation === "/") ? active : ""} href="/">Home</a>
+                <a className={(currLocation === "/dashboard") ? active : ""}  href="/dashboard">Dashboard</a>
+                <a className={(currLocation === "/explore") ? active : ""}  href="/explore">Explore</a>
                 {
                     (user !== null) ? (
                         <button type="button" className="rounded-full" onClick={handleLogOut}>
