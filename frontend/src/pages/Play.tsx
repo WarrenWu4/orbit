@@ -137,7 +137,7 @@ export default function Play() {
                   videoRef.current!.currentTime
                 );
                 if (videoRef.current!.currentTime % 5 <= 0.1) {
-                  setScore(Math.round(score));
+                  setScore((prev) => Math.round(score)+prev);
                 }
               }
             }

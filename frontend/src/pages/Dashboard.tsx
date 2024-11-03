@@ -105,7 +105,7 @@ function MainContent() {
               const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
               console.log("File available at", downloadURL);
               // upload video link and data to firestore
-              await fetch("http://127.0.0.1:5000/video_process", {
+              await fetch("http://localhost:5000/video_process", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
