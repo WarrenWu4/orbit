@@ -11,7 +11,7 @@ import "./Play.css"; // Import the CSS file
 
 export default function Play() {
   const { videoId } = useParams();
-  console.log(videoId);
+  // console.log(videoId);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const webcamRef = useRef<HTMLVideoElement | null>(null);
@@ -20,6 +20,22 @@ export default function Play() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [currentTime, setCurrentTime] = useState(0);
+  const [countDown, setCountDown] = useState(0);
+
+  useEffect(() => {
+    if (isPlaying) {
+      setCountDown(3);
+      const countdownInterval = setInterval(() => {
+        setCountDown((prevCount) => {
+          if (prevCount === 1) {
+            clearInterval(countdownInterval);
+            return 0;
+          }
+          return prevCount - 1;
+        });
+      }, 1000);
+    }
+  }, [isPlaying]);
 
   let poseLandmarker: PoseLandmarker | undefined;
   let webcamRunning: boolean = false;
@@ -171,7 +187,10 @@ export default function Play() {
       if (isPlaying) {
         videoRef.current.pause();
       } else {
-        videoRef.current.play();
+        setTimeout(() => {
+          videoRef.current?.play();
+        }, 3000);
+        // videoRef.current.play();
       }
       setIsPlaying(!isPlaying);
     }
@@ -197,7 +216,7 @@ export default function Play() {
     <Page>
       <div className="flex flex-row justify-between space-x-4">
         {/* Dance/Comparison Video with Pose Detection Overlay */}
-        <div className="videoView" style={{ height: "500px" }}>
+        <div className="videoView relative" style={{ height: "500px" }}>
           <video
             id="danceVideo"
             ref={videoRef}
@@ -218,6 +237,11 @@ export default function Play() {
               left: 0,
             }}
           />
+          {countDown > 0 && (
+            <div className="absolute inset-0 bg-gray-700 bg-opacity-75 flex flex-col items-center justify-center text-white">
+              {countDown}
+            </div>
+          )}
         </div>
 
         {/* Webcam Video with Pose Detection Overlay */}
@@ -257,11 +281,11 @@ export default function Play() {
         <div className="speed-controls flex space-x-2">
           {[0.25, 0.5, 1, 1.5, 2].map((speed) => (
             <button
+              disabled={isPlaying}
               key={speed}
               onClick={() => handleSpeedChange(speed)}
-              className={`btn p-2 rounded-full ${
-                playbackRate === speed ? "bg-green-600" : "bg-gray-600"
-              } hover:bg-green-700 flex items-center`}
+              className={`btn p-2 rounded-full ${playbackRate === speed ? "bg-green-600" : "bg-gray-600"
+                } hover:bg-green-700 flex items-center`}
             >
               <FaTachometerAlt className="mr-1" />
               {speed}x
